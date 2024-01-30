@@ -2,6 +2,8 @@ import requests
 import json
 from enum import Enum
 
+# TODO: STORING TOKEN IN JSON FOR NOW. CHANGE LATER
+
 class LoginStatus(Enum):
     SUCCESS = 'success'
     NEED_MFA = 'need_mfa'
@@ -12,6 +14,7 @@ class LoginStatus(Enum):
 # base headers for all requests. add referer and authorization
 f = open('base_headers.json', 'r')
 headers = json.load(f)
+f.close()
 
 # Saves login token and returns a LoginStatus
 # param: email, password, mfa_code?
@@ -49,15 +52,17 @@ def login(email: str, password: str, mfa_code: str = None):
         if res.json().get('code') == 60008:
             return LoginStatus.FAILED_MFA
         # successful login with MFA
-        print(res.json().get('token'))
+        with open('token.json', 'w') as f:
+            json.dump({'token': res.json().get('token')}, f)
         return LoginStatus.SUCCESS
     # successful login without MFA
-    print(res.json().get('token'))
+    with open('token.json', 'w') as f:
+        json.dump({'token': res.json().get('token')}, f)
     return LoginStatus.SUCCESS
 
 def logout():
 
     # send logout request
     res = requests.post(url = 'https://discord.com/api/v9/auth/logout', 
-                        headers = headers | {'referer': 'https://discord.com/login', 'authorization': ""})
-    print(res.json())
+                        headers = headers | {'referer': 'https://discord.com/login', 'authorization': ''})
+
