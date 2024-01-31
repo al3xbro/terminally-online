@@ -1,8 +1,6 @@
 import requests
 import json
-from websockets.sync.client import connect
-import time
-import threading
+import websocket
 
 # base headers for all requests. add referer and authorization
 f = open('base_headers.json', 'r')

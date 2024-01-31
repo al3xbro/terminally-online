@@ -19,7 +19,7 @@ def __connect_websocket() ->  ClientConnection:
 
     # start heartbeat thread
     interval = reply['d']['heartbeat_interval']
-    threading.Thread(target = heartbeat, args = (interval, ws)).start()
+    threading.Thread(target = __heartbeat, args = (interval, ws)).start()
 
     # identify yourself
     ws.send(json.dumps({
@@ -37,7 +37,7 @@ def __connect_websocket() ->  ClientConnection:
 
     return ws
 
-def heartbeat(interval, ws):
+def __heartbeat(interval, ws):
     """Heartbeat for websocket connection"""
 
     # TODO: send accurate d value
@@ -49,7 +49,7 @@ def heartbeat(interval, ws):
             'd': None
         }))
         
-def get_websocket():
+def get_websocket() -> ClientConnection:
     """Returns ClientConnection object"""
 
     global ws
