@@ -21,7 +21,7 @@ def get_message_history(guild_id: str, channel_id: str) -> list:
                            'authorization': token,
                         })
     
-    # return messages
+    # return messages TODO: better error handling and documentation
     try:
         return list(res.json())
     except:
@@ -39,7 +39,7 @@ def send_message(guild_id: str, channel_id: str, content: str):
                         data = json.dumps({'content': content})
                         )
     
-    # return status
+    # return status TODO: better error handling and documentation
     if res.status_code == 200:
         return True
     return False
