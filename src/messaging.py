@@ -11,11 +11,11 @@ f = open('token.json', 'r')
 token = json.load(f).get('token')
 f.close()
 
-def get_message_history(guild_id: str, channel_id: str) -> list:
+def get_message_history(guild_id: str, channel_id: str, limit: int) -> list:
     """Returns a list of messages in the current channel"""
 
     # send request
-    res = requests.get(url = f'https://discord.com/api/v9/channels/{channel_id}/messages', 
+    res = requests.get(url = f'https://discord.com/api/v9/channels/{channel_id}/messages?limit={limit}', 
                         headers = headers | {
                            'referer': f'https://discord.com/channels/{guild_id}/{channel_id}',
                            'authorization': token,
