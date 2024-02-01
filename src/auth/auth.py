@@ -21,7 +21,7 @@ headers = json.load(f)
 f.close()
 
 def login(email: str, password: str, mfa_code: str = None) -> LoginStatus:
-    """Saves login token and returns a LoginStatus"""
+    '''Saves login token and returns a LoginStatus'''
 
     # send login request
     res = requests.post(url = 'https://discord.com/api/v9/auth/login', 
@@ -70,7 +70,7 @@ def login(email: str, password: str, mfa_code: str = None) -> LoginStatus:
     return LoginStatus.SUCCESS
 
 def logout() -> LogoutStatus:
-    """Invalidates login token and returns a LogoutStatus"""
+    '''Invalidates login token and returns a LogoutStatus'''
 
     # send logout request
     res = requests.post(url = 'https://discord.com/api/v9/auth/logout', 

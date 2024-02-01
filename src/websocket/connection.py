@@ -1,8 +1,9 @@
 import json
-from websockets.sync.client import connect
-from websockets.client import ClientConnection
 import time
 import threading
+
+from websockets.sync.client import connect
+from websockets.client import ClientConnection
 
 # get login token TODO: move to auth.py and change token storage
 f = open('token.json', 'r')
@@ -10,7 +11,7 @@ token = json.load(f).get('token')
 f.close()
 
 def __connect_websocket() ->  ClientConnection:
-    """Connects to Discord websocket with user token. Do not invoke."""
+    '''Connects to Discord websocket with user token. Do not invoke.'''
 
     # websocket handshake
     ws = connect('wss://gateway.discord.gg/?v=9&encoding=json', max_size=999999999)
@@ -38,10 +39,9 @@ def __connect_websocket() ->  ClientConnection:
     return ws
 
 def __heartbeat(interval, ws):
-    """Heartbeat for websocket connection"""
+    '''Heartbeat for websocket connection. Do not invoke'''
 
     # TODO: send accurate d value
-    print("heartbeat")
     while True:
         time.sleep(interval / 1000)
         ws.send(json.dumps({
@@ -50,7 +50,7 @@ def __heartbeat(interval, ws):
         }))
         
 def get_websocket() -> ClientConnection:
-    """Returns ClientConnection object"""
+    '''Returns ClientConnection object'''
 
     global ws
     return ws

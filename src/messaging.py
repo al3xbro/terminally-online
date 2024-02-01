@@ -1,6 +1,5 @@
 import requests
 import json
-import websocket
 
 # base headers for all requests. add referer and authorization
 f = open('base_headers.json', 'r')
