@@ -1,14 +1,10 @@
 import requests
 import json
+from auth import auth
 
 # base headers for all requests. add referer and authorization
 f = open('base_headers.json', 'r')
 headers = json.load(f)
-f.close()
-
-# get login token TODO: move to auth.py and change token storage
-f = open('token.json', 'r')
-token = json.load(f).get('token')
 f.close()
 
 def get_message_history(guild_id: str, channel_id: str, limit: int) -> list:
@@ -18,7 +14,7 @@ def get_message_history(guild_id: str, channel_id: str, limit: int) -> list:
     res = requests.get(url = f'https://discord.com/api/v9/channels/{channel_id}/messages?limit={limit}', 
                         headers = headers | {
                            'referer': f'https://discord.com/channels/{guild_id}/{channel_id}',
-                           'authorization': token,
+                           'authorization': auth.get_token(),
                         })
     
     # return messages TODO: better error handling and documentation
@@ -34,7 +30,7 @@ def send_message(guild_id: str, channel_id: str, content: str):
     res = requests.post(url = f'https://discord.com/api/v9/channels/{channel_id}/messages', 
                         headers = headers | {
                             'referer': f'https://discord.com/channels/{guild_id}/{channel_id}',
-                            'authorization': token,
+                            'authorization': auth.get_token(),
                         },
                         data = json.dumps({'content': content})
                         )

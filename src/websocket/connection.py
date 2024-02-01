@@ -1,6 +1,7 @@
 import json
 import time
 import threading
+from auth import auth
 
 from websockets.sync.client import connect
 from websockets.client import ClientConnection
@@ -27,7 +28,7 @@ class Connection:
         ws.send(json.dumps({
             'op': 2,
             'd': {
-                'token': json.load(open('token.json', 'r')).get('token'),
+                'token': auth.get_token(),
                 'compress': False,
                 'properties': {
                     '$os': 'Windows',

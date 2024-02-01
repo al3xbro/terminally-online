@@ -1,8 +1,10 @@
 import requests
 import json
+import os
 from enum import Enum
 
-# TODO: STORING TOKEN IN JSON FOR NOW. CHANGE LATER
+CONFIG_PATH = os.path.abspath(os.path.expanduser('~/.config/termon/'))
+TOKEN_PATH = os.path.join(CONFIG_PATH, 'token')
 
 class LoginStatus(Enum):
     SUCCESS = 'success'
@@ -10,6 +12,7 @@ class LoginStatus(Enum):
     FAILED_VERIFICATION_EMAIL = 'failed_verification_email'
     FAILED_CREDENTIALS = 'failed_login'
     FAILED_MFA = 'failed_mfa'
+    INVALID_TOKEN = 'invalid_token'
 
 class LogoutStatus(Enum):
     SUCCESS = 'success'
@@ -59,14 +62,10 @@ def login(email: str, password: str, mfa_code: str = None) -> LoginStatus:
         if res.json().get('code') == 60008:
             return LoginStatus.FAILED_MFA
         
-        # successful login with MFA
-        with open('token.json', 'w') as f:
-            json.dump({'token': res.json().get('token')}, f)
-        return LoginStatus.SUCCESS
-    
-    # successful login without MFA
-    with open('token.json', 'w') as f:
-        json.dump({'token': res.json().get('token')}, f)
+    # successful login
+    os.makedirs(CONFIG_PATH, exist_ok=True)
+    with open(TOKEN_PATH, 'w+') as f:
+        f.write(res.json().get('token'))
     return LoginStatus.SUCCESS
 
 def logout() -> LogoutStatus:
@@ -76,7 +75,7 @@ def logout() -> LogoutStatus:
     res = requests.post(url = 'https://discord.com/api/v9/auth/logout', 
                         headers = headers | {
                             'referer': 'https://discord.com/login', 
-                            'authorization': json.load(open('token.json', 'r')).get('token'),
+                            'authorization': f.write(res.json().get('token')),
                         },
                         data = json.dumps({
                             'provider': None,
@@ -86,3 +85,8 @@ def logout() -> LogoutStatus:
     if res.status_code == 204:
         return LogoutStatus.SUCCESS
     return LogoutStatus.FAILED
+
+def get_token() -> str:
+    '''Returns the login token'''
+    with open(TOKEN_PATH, 'r') as f:
+        return f.read()
