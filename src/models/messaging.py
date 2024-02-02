@@ -3,7 +3,7 @@ import json
 from collections import defaultdict
 
 from auth import auth
-from websocket import websocket_listener
+from websocket.listener import Listener
 
 # base headers for all requests. add referer and authorization
 f = open('base_headers.json', 'r')
@@ -69,8 +69,11 @@ class Messaging:
         return False
 
     @staticmethod
-    def recieve_message(message: dict):
+    def __recieve_message(message: dict):
         '''Recieves a message from the websocket.'''
 
-        # place message in a subscribed channel, if subscribed to
+        # TODO: if channel is subscribed to, add message to cache and call callback
+        print(json.dumps(message))
+
+    Listener.add_event('MESSAGE_CREATE', __recieve_message)
         

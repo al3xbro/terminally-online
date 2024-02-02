@@ -41,7 +41,7 @@ class Connection:
         return ws
 
     @staticmethod
-    def __heartbeat(interval, ws):
+    def __heartbeat(interval: int, ws: ClientConnection) -> None:
         '''Heartbeat for websocket connection. Do not invoke'''
 
         # TODO: send accurate d value
