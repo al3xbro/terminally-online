@@ -5,21 +5,21 @@ import threading
 
 class Listener:
     
-    # { event: [callback] }
+    # { event_id: [callback] }
     events = defaultdict(lambda: list())
 
     @staticmethod
-    def add_event(event: str, callback: callable) -> None:
-        '''Adds an event and its callback to event dictionary. The callback function must take one argument.''' # TODO: figure out how to specify callable arguments
+    def subscribe_event(event_id: str, callback: callable) -> None:
+        '''Invokes callable whenever receiving event_id. The callback function must take one argument.''' # TODO: figure out how to specify callable arguments
 
-        if event not in Listener.events:
-            Listener.events[event] = [callback]
+        if event_id not in Listener.events:
+            Listener.events[event_id] = [callback]
         else:
-            Listener.events[event].append(callback)
+            Listener.events[event_id].append(callback)
 
     @staticmethod
     def __listener_loop():
-        '''Listens for events and calls callbacks.'''
+        '''Listens for events and invokes callbacks.'''
 
         # executes callbacks for each event, passing data
         while True:
@@ -29,4 +29,5 @@ class Listener:
             for callback in Listener.events[reply.get('t')]:
                 callback(reply.get('d'))
 
+    # start listener loop
     threading.Thread(target = __listener_loop).start()
