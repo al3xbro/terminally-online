@@ -12,8 +12,18 @@ class Connection:
     ws = None
 
     @staticmethod
+    def get_websocket() -> ClientConnection:
+        '''Returns ClientConnection object.'''
+        
+        # connect if not connected
+        if not Connection.ws:
+            Connection.ws = Connection.__connect_websocket()
+
+        return Connection.ws
+        
+    @staticmethod
     def __connect_websocket() ->  ClientConnection:
-        '''Connects to Discord websocket with user token. Do not invoke.'''
+        '''Connects to Discord websocket with user token.'''
 
         # websocket handshake
         ws = connect('wss://gateway.discord.gg/?v=9&encoding=json', max_size=999999999)
@@ -41,8 +51,8 @@ class Connection:
         return ws
 
     @staticmethod
-    def __heartbeat(interval, ws):
-        '''Heartbeat for websocket connection. Do not invoke'''
+    def __heartbeat(interval: int, ws: ClientConnection) -> None:
+        '''Heartbeat for websocket connection.'''
 
         # TODO: send accurate d value
         while True:
@@ -52,12 +62,3 @@ class Connection:
                 'd': None
             }))
             
-    @staticmethod
-    def get_websocket() -> ClientConnection:
-        '''Returns ClientConnection object'''
-        
-        if Connection.ws:
-            return Connection.ws
-        else:
-            Connection.ws = Connection.__connect_websocket()
-            return Connection.ws
