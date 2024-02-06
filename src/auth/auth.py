@@ -75,7 +75,7 @@ def logout() -> LogoutStatus:
     res = requests.post(url = 'https://discord.com/api/v9/auth/logout', 
                         headers = headers | {
                             'referer': 'https://discord.com/login', 
-                            'authorization': f.write(res.json().get('token')),
+                            'authorization': get_token(),
                         },
                         data = json.dumps({
                             'provider': None,
