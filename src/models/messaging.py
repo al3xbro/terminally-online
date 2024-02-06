@@ -76,5 +76,5 @@ class Messaging:
         # TODO: if channel is subscribed to, add message to cache and call callback
         print(json.dumps(message))
 
-    Listener.add_event('MESSAGE_CREATE', __recieve_message)
+    Listener.subscribe_event('MESSAGE_CREATE', __recieve_message)
         
