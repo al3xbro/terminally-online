@@ -12,7 +12,7 @@ f.close()
 
 class Messaging:
     
-    # { channel_id: ([messages], callback) }
+    # { channel_id: ([message_dict], {message_id: message_index}, callback) }
     subscribed_channels = defaultdict(None)
 
     @staticmethod
@@ -24,8 +24,11 @@ class Messaging:
             return
 
         # add channel to subscribed channels and populate cache TODO: come up with cache eviction policy
+        history = Messaging.__get_message_history(channel_id)
+
         Messaging.subscribed_channels[channel_id] = (
-            Messaging.__get_message_history(channel_id),
+            history, 
+            { message.get('id'): i for i, message in enumerate(history) },
             callback
         )
 
@@ -70,11 +73,25 @@ class Messaging:
 
 
     @staticmethod
-    def __recieve_message(message: dict):
+    def __create_message(data: dict):
         '''Recieves a message from the websocket.'''
 
         # TODO: if channel is subscribed to, add message to cache and call callback
-        print(json.dumps(message))
+        Messaging.subscribed_channels[data.get('channel_id')][0].append(data)
+        Messaging.subscribed_channels[data.get('channel_id')][1](data)
 
-    Listener.subscribe_event('MESSAGE_CREATE', __recieve_message)
+    @staticmethod
+    def __delete_message(data: dict):
+        '''Recieves a message from the websocket.'''
+        pass
+
+    @staticmethod
+    def __edit_message(data: dict):
+        '''Recieves a message from the websocket.'''
+        pass
+
+    Listener.subscribe_event('MESSAGE_CREATE', __create_message)
+    Listener.subscribe_event('MESSAGE_DELETE', __delete_message)
+    Listener.subscribe_event('MESSAGE_EDIT', __edit_message)
+
         
