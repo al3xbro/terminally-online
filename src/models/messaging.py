@@ -71,7 +71,6 @@ class Messaging:
         except:
             return []
 
-
     @staticmethod
     def __create_message(message_data: dict):
         '''Recieves a message from the websocket.'''
@@ -83,7 +82,7 @@ class Messaging:
             channel_id[1][message_data.get('id')] = len(channel_id[0]) - 1
             # invoke callback
             channel_id[2]()
-
+            
     @staticmethod
     def __delete_message(message_data: dict):
         '''Recieves a message from the websocket.'''
