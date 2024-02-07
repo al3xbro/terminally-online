@@ -38,8 +38,13 @@ class Listener:
                 # if event has been registered, execute callbacks
                 for callback in Listener.events[reply.get('t')]:
                     callback(reply.get('d'))
-            except ConnectionClosed: 
-                Connection.reconnect_websocket(Connection.reconnect_url, Connection.session_id)
+
+            # reconnect on connection closed
+            except ConnectionClosed:
+                try:
+                    Connection.reconnect_websocket(Connection.reconnect_url, Connection.session_id)
+                except:
+                    Connection.reconnect_websocket(Connection.gateway_url)
 
     # start listener loop
     threading.Thread(target = __listener_loop).start()

@@ -11,6 +11,7 @@ class Connection:
 
     # static ws object
     ws = None
+    gateway_url = None
 
     @staticmethod
     def get_websocket() -> ClientConnection:
@@ -24,7 +25,7 @@ class Connection:
         
 
     @staticmethod
-    def reconnect_websocket(reconnect_url: str, session_id: str) -> None:
+    def reconnect_websocket(reconnect_url: str, session_id: str = '') -> None:
         '''Reconnects to Discord websocket.'''
 
         # websocket handshake
@@ -46,10 +47,10 @@ class Connection:
         '''Connects to Discord websocket with user token.'''
 
         # get gateway url
-        gateway_url = requests.get('https://discord.com/api/v9/gateway').json().get('url')
+        Connection.gateway_url = requests.get('https://discord.com/api/v9/gateway').json().get('url')
 
         # websocket handshake
-        ws = connect(f'{gateway_url}/?v=9&encoding=json', max_size=999999999)
+        ws = connect(f'{Connection.gateway_url}/?v=9&encoding=json', max_size=999999999)
         # get hello and heartbeat interval
         reply = json.loads(ws.recv())
 
