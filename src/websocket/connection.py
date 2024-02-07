@@ -1,6 +1,7 @@
 import json
 import time
 import threading
+import requests
 from auth import auth
 
 from websockets.sync.client import connect
@@ -10,6 +11,7 @@ class Connection:
 
     # static ws object
     ws = None
+    gateway_url = None
 
     @staticmethod
     def get_websocket() -> ClientConnection:
@@ -21,12 +23,34 @@ class Connection:
 
         return Connection.ws
         
+
+    @staticmethod
+    def reconnect_websocket(reconnect_url: str, session_id: str = '') -> None:
+        '''Reconnects to Discord websocket.'''
+
+        # websocket handshake
+        ws = connect(f'{reconnect_url}/?v=9&encoding=json', max_size=999999999)
+        # send resume event
+        ws.send(json.dumps({
+            'op': 6,
+            'd': {
+                'token': auth.get_token(),
+                'session_id': session_id,
+                'seq': 0
+            }
+        }))
+
+        Connection.ws = ws
+
     @staticmethod
     def __connect_websocket() ->  ClientConnection:
         '''Connects to Discord websocket with user token.'''
 
+        # get gateway url
+        Connection.gateway_url = requests.get('https://discord.com/api/v9/gateway').json().get('url')
+
         # websocket handshake
-        ws = connect('wss://gateway.discord.gg/?v=9&encoding=json', max_size=999999999)
+        ws = connect(f'{Connection.gateway_url}/?v=9&encoding=json', max_size=999999999)
         # get hello and heartbeat interval
         reply = json.loads(ws.recv())
 
