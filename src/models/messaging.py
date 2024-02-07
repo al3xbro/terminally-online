@@ -113,4 +113,4 @@ class Messaging:
 
     Listener.subscribe_event('MESSAGE_CREATE', __create_message)
     Listener.subscribe_event('MESSAGE_DELETE', __delete_message)
-    Listener.subscribe_event('MESSAGE_EDIT', __edit_message)
+    Listener.subscribe_event('MESSAGE_UPDATE', __edit_message)
