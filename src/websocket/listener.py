@@ -10,7 +10,7 @@ class Listener:
 
     @staticmethod
     def subscribe_event(event_id: str, callback: callable) -> None:
-        '''Invokes callable whenever receiving event_id. The callback function must take one argument.''' # TODO: figure out how to specify callable arguments
+        '''Invokes callback whenever receiving event_id. The callback function must take one argument.''' # TODO: figure out how to specify callable arguments
 
         if event_id not in Listener.events:
             Listener.events[event_id] = [callback]
