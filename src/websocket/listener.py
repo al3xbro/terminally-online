@@ -1,5 +1,7 @@
 import json
 from collections import defaultdict
+
+from websockets import ConnectionClosed
 from websocket.connection import Connection
 import threading
 
@@ -7,6 +9,8 @@ class Listener:
     
     # { event_id: [callback] }
     events = defaultdict(lambda: list())
+    reconnect_url = None
+    session_id = None
 
     @staticmethod
     def subscribe_event(event_id: str, callback: callable) -> None:
@@ -23,11 +27,19 @@ class Listener:
 
         # executes callbacks for each event, passing data
         while True:
-            reply = json.loads(Connection.get_websocket().recv())
-            
-            # if event has been registered, execute callbacks
-            for callback in Listener.events[reply.get('t')]:
-                callback(reply.get('d'))
+            try: 
+                reply = json.loads(Connection.get_websocket().recv())
+
+                # on ready, update reconnect_url and session_id
+                if reply.get('t') == 'READY':
+                    Listener.reconnect_url = reply.get('d').get('resume_gateway_url')
+                    Listener.session_id = reply.get('d').get('session_id')
+                
+                # if event has been registered, execute callbacks
+                for callback in Listener.events[reply.get('t')]:
+                    callback(reply.get('d'))
+            except ConnectionClosed: 
+                Connection.reconnect_websocket(Connection.reconnect_url, Connection.session_id)
 
     # start listener loop
     threading.Thread(target = __listener_loop).start()
