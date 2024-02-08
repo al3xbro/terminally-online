@@ -5,13 +5,15 @@ import requests
 from auth import auth
 
 from websockets.sync.client import connect
+from websockets import ConnectionClosed
 from websockets.client import ClientConnection
 
 class Connection:
 
-    # static ws object
     ws = None
     gateway_url = None
+    heartbeat_thread = None
+    heartbeat_interval = None
 
     @staticmethod
     def get_websocket() -> ClientConnection:
@@ -19,7 +21,7 @@ class Connection:
         
         # connect if not connected
         if not Connection.ws:
-            Connection.ws = Connection.__connect_websocket()
+            Connection.__connect_websocket()
 
         return Connection.ws
         
@@ -39,8 +41,12 @@ class Connection:
                 'seq': 0
             }
         }))
-
+        # stop old heartbeat thread
+        Connection.heartbeat_thread.join()
+        # update ws object
         Connection.ws = ws
+        # start new heartbeat thread
+        Connection.heartbeat_thread = threading.Thread(target = Connection.__heartbeat, args = (Connection.heartbeat_interval, Connection.ws))
 
     @staticmethod
     def __connect_websocket() ->  ClientConnection:
@@ -55,8 +61,9 @@ class Connection:
         reply = json.loads(ws.recv())
 
         # start heartbeat thread
-        interval = reply['d']['heartbeat_interval']
-        threading.Thread(target = Connection.__heartbeat, args = (interval, ws)).start()
+        Connection.heartbeat_interval = reply['d']['heartbeat_interval']
+        Connection.heartbeat_thread = threading.Thread(target = Connection.__heartbeat, args = (Connection.heartbeat_interval, ws))
+        Connection.heartbeat_thread.start()
 
         # identify yourself
         ws.send(json.dumps({
@@ -72,17 +79,20 @@ class Connection:
             }
         }))
 
-        return ws
+        Connection.ws = ws
 
     @staticmethod
     def __heartbeat(interval: int, ws: ClientConnection) -> None:
         '''Heartbeat for websocket connection.'''
 
         # TODO: send accurate d value
-        while True:
-            time.sleep(interval / 1000)
-            ws.send(json.dumps({
-                'op': 1,
-                'd': None
-            }))
-            
+        is_connected = True
+        while is_connected:
+            try:
+                time.sleep(interval / 1000)
+                ws.send(json.dumps({
+                    'op': 1,
+                    'd': None
+                }))
+            except ConnectionClosed:
+                is_connected = False

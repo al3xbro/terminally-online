@@ -1,9 +1,9 @@
 import json
 from collections import defaultdict
+import threading
 
 from websockets import ConnectionClosed
 from websocket.connection import Connection
-import threading
 
 class Listener:
     
