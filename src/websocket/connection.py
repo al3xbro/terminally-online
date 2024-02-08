@@ -2,10 +2,10 @@ import json
 import time
 import threading
 import requests
-from websockets import ConnectionClosed
 from auth import auth
 
 from websockets.sync.client import connect
+from websockets import ConnectionClosed
 from websockets.client import ClientConnection
 
 class Connection:
