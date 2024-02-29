@@ -39,6 +39,11 @@ class Messaging:
         return Messaging.__subscribed_channels[channel_id][0] or [] # TODO: change based on cache eviction policy
 
     @staticmethod
+    def request_old_messages(channel_id: str, message_id: str) -> None:
+        # TODO: implement
+        pass
+
+    @staticmethod
     def send_message(channel_id: str, content: str):
         '''Sends a message to channel'''
 
