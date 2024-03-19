@@ -12,12 +12,15 @@ f.close()
 
 class Messaging:
     
-    # { channel_id: ([message_dict], {message_id: message_index}, callback) }
+    # { channel_id: (
+    #     MessageList,
+    #     callback
+    # ) }
     __subscribed_channels = defaultdict(None)
 
     @staticmethod
     def subscribe_channel(channel_id: str, callback: callable) -> None:
-        '''Add a channel to a list of subscribed channels. The callback function is invoked when a new message is recieved.'''
+        '''Add a channel to a list of subscribed channels. The callback function is invoked when a new message is received.'''
 
         # check if already subscribed
         if channel_id in Messaging.__subscribed_channels:
@@ -40,6 +43,7 @@ class Messaging:
 
     @staticmethod
     def request_old_messages(channel_id: str, message_id: str) -> None:
+        '''Requests old messages from the server before message_id. The channel must be already subscribed to.'''
         # TODO: implement
         pass
 
