@@ -8,6 +8,7 @@ def display_new():
     os.system('clear')
 
     messages = Messaging.get_messages(channel)
+    Messaging.request_older_messages(channel)
     for message in messages:
         print(f'{message.get("author").get("username")}: {message.get("content")}')
 

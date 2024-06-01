@@ -13,12 +13,14 @@ class MessageList:
             self.next = None
             self.prev = None
         
-    def __init__(self):
+    def __init__(self, messages = []):
         '''Initialize an empty list.'''
 
         self.message_dict = defaultdict(lambda: None)
         self.head = None
         self.tail = None
+        for message in messages:
+            self.append(message.get('id'), message)
 
     def append(self, message_id, message):
         '''Append a message to the list.'''
@@ -85,6 +87,7 @@ class MessageList:
         
         node.message = new_message
 
+    # TODO: find a better way to implement this
     def __iter__(self):
         '''Return an iterator for the list.'''
         self.node = self.head

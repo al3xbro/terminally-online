@@ -1,0 +1,33 @@
+[
+    {
+        "type": 0,
+        "channel_id": "1089098339540291627",
+        "content": "LMAOOO",
+        "attachments": [],
+        "embeds": [],
+        "timestamp": "2024-05-30T21: 08: 10.044000+00: 00",
+        "edited_timestamp": "None",
+        "flags": 0,
+        "components": [],
+        "id": "1245846238843113573",
+        "author": {
+            "id": "328309041518608385",
+            "username": "spheno",
+            "avatar": "51aac6635fbf1cd9d3ee1aa2f35278bd",
+            "discriminator": "0",
+            "public_flags": 256,
+            "flags": 256,
+            "banner": "None",
+            "accent_color": "None",
+            "global_name": "Spheno",
+            "avatar_decoration_data": "None",
+            "banner_color": "None",
+            "clan": "None"
+        },
+        "mentions": [],
+        "mention_roles": [],
+        "pinned": "False",
+        "mention_everyone": "False",
+        "tts": "False"
+    }
+]
