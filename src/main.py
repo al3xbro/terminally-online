@@ -13,7 +13,7 @@ def display_new():
 
     print('\n> ', end='')
 
-Messaging.subscribe_channel(channel, display_new)
+Messaging.subscribe_channel(channel, display_new)   
 display_new()
 
 while True:
