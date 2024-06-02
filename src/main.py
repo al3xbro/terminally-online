@@ -1,22 +1,38 @@
+from textual.app import App
 from models.messaging import Messaging
-import os
+from views.message import Message
+from textual.containers import VerticalScroll
+from textual.widgets import Header
 
-# TEMP: just a test
-channel = "832033238004138006"
+class TerminallyOnline(App):
 
-def display_new():
-    os.system('clear')
+    CSS_PATH = 'style.tcss'
 
-    messages = Messaging.get_messages(channel)
-    Messaging.request_older_messages(channel)
-    for message in messages:
-        print(f'{message.get("author").get("username")}: {message.get("content")}')
+    def __init__(self):
+        self.channel = '832033238004138006'
+        Messaging.subscribe_channel(self.channel, self.display_new)
+        self.messages = Messaging.get_messages(self.channel)
+        super().__init__()
 
-    print('\n> ', end='')
+    # i want to call this method whenever a new message is received. this should update my chat log
+    def display_new(self):
+        self.refresh(recompose=True)
+        self.call_after_refresh(self.scroll_to_end)
 
-Messaging.subscribe_channel(channel, display_new)   
-display_new()
+    def scroll_to_end(self):
+        self.query_one('#scrollable').scroll_end(animate=False)
 
-while True:
-    message = input()
-    Messaging.send_message(channel, message)
+    def on_mount(self):
+        self.scroll_to_end()
+
+    def compose(self): 
+        yield Header()
+        iterator = iter(self.messages)
+        with VerticalScroll(id='scrollable'):
+            for message in iterator:
+                yield Message(message)
+        
+
+if __name__ == '__main__':
+    app = TerminallyOnline()
+    app.run()
