@@ -2,7 +2,7 @@ from models.messaging import Messaging
 import os
 
 # TEMP: just a test
-channel = "1089098339540291627"
+channel = "832033238004138006"
 
 def display_new():
     os.system('clear')
