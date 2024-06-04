@@ -8,7 +8,7 @@ class TerminallyOnline(App):
 
     def compose(self):
         yield Header()
-        yield Chat('832033238004138006')
+        yield Chat('1184053178975662192')
 
 if __name__ == '__main__':
     app = TerminallyOnline()

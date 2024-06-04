@@ -1,4 +1,4 @@
-Horizontal {
+.message {
     height: 1;
 }
 

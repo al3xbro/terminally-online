@@ -12,16 +12,14 @@ class Message(Static):
         self.message = message
 
     def delete(self):
-        c = self.query_one('.content')
-        c.add_class('deleted')
-        print('bruh')
+        self.query_one('.content').add_class('deleted')
 
     def update_content(self, content: str):
         self.message = { **self.message, 'content': content }
 
     def compose(self):
-        with Horizontal():
-            yield Label(f"{self.message['author']['username']}:", classes='username')
+        with Horizontal(classes='message'):
+            yield Label(f"{self.message['author']['username']}: ", classes='username')
             yield Label(self.message['content'], classes='content')
             yield (Label(' (edited)', classes='edited') if self.message.get('edited_timestamp') else Label(''))
             yield Label(datetime.fromisoformat(self.message['timestamp']).strftime('%m-%d-%Y %H:%M:%S'), classes='timestamp')
