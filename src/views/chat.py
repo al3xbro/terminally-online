@@ -29,7 +29,8 @@ class Chat(VerticalScroll):
         self.scroll_end(animate=False)
 
     def delete_message(self, message: dict):
-        self.remove(self.query_one(f'#message-{message["id"]}'))
+        old_message = self.query_one(f'#message-{message["id"]}')
+        old_message.delete()
 
     def edit_message(self, message: dict):
         old_message = self.query_one(f'#message-{message["id"]}')

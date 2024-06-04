@@ -14,3 +14,7 @@ Horizontal {
 .edited {
     color: $primary-background;
 }
+
+.deleted {
+    color: #ff4a4a;
+}

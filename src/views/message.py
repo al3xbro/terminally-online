@@ -7,12 +7,16 @@ class Message(Static):
 
     message = reactive('', recompose=True)
 
-    def __init__(self, message, id):
-        super().__init__(id=id)
+    def __init__(self, message, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.message = message
 
+    def delete(self):
+        c = self.query_one('.content')
+        c.add_class('deleted')
+        print('bruh')
+
     def update_content(self, content: str):
-        print('update')
         self.message = { **self.message, 'content': content }
 
     def compose(self):
