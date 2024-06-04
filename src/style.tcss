@@ -5,3 +5,12 @@ Horizontal {
 .username {
     width: 10;
 }
+
+.timestamp {
+    dock: right;
+    color: $primary-background;
+}
+
+.edited {
+    color: $primary-background;
+}
