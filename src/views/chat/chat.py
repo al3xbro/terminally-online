@@ -1,5 +1,5 @@
 from textual.containers import VerticalScroll
-from views.message import Message
+from views.chat.message import Message
 from models.messaging import Messaging
 
 class Chat(VerticalScroll):

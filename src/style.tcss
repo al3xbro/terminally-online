@@ -18,3 +18,14 @@
 .deleted {
     color: #ff4a4a;
 }
+
+Chat {
+    padding: 2;
+    padding-right: 0;
+}
+
+CommandInput {
+   margin-left: 2;
+   margin-right: 2;
+   margin-bottom: 2;
+}

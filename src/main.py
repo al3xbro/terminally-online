@@ -1,14 +1,17 @@
 from textual.app import App
-from views.chat import Chat
+from views.chat.chat import Chat
+from views.input.input import CommandInput
 from textual.widgets import Header
 
 class TerminallyOnline(App):
 
     CSS_PATH = 'style.tcss'
+    channel_id = '1184053178975662192'
 
     def compose(self):
         yield Header()
-        yield Chat('1184053178975662192')
+        yield Chat(self.channel_id)
+        yield CommandInput(self.channel_id)
 
 if __name__ == '__main__':
     app = TerminallyOnline()
