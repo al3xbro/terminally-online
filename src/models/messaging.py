@@ -1,7 +1,7 @@
+from queue import Queue
 import requests
 import json
 from utils.mlist import MessageList
-from collections import defaultdict
 
 from auth import auth
 from websocket.listener import Listener
@@ -14,15 +14,13 @@ f.close()
 class Messaging:
     
     # { 
-    #     channel_id: (
-    #         MessageList,
-    #         callback
-    #     ) 
+    #     channel_id: MessageList
     # }
     __subscribed_channels = {}
+    queue = Queue()
 
     @staticmethod
-    def subscribe_channel(channel_id: str, callback: callable) -> None:
+    def subscribe_channel(channel_id: str) -> None:
         '''Add a channel to a list of subscribed channels. The callback function is invoked when a new message is received.'''
 
         # check if already subscribed
@@ -35,7 +33,6 @@ class Messaging:
         # add to cache
         Messaging.__subscribed_channels[channel_id] = (
             MessageList(history),
-            callback
         )
 
     @staticmethod
@@ -54,9 +51,12 @@ class Messaging:
         # get history
         history = Messaging.__get_message_history(channel_id, before=next(iterator).get('id'))[::-1]
         
-        # add to cache
+        # add to cache and tell the view to add the message
         for message in history:
             Messaging.__subscribed_channels[channel_id][0].prepend(message.get('id'), message)
+            Messaging.queue.put({
+                'type': 'p'
+            })
 
 
     @staticmethod
@@ -93,15 +93,18 @@ class Messaging:
             return []
 
     @staticmethod
-    def __create_message(message_data: dict):
+    def __append_message(message_data: dict):
         '''Recieves a message from the websocket.'''
 
         if message_data.get('channel_id') in Messaging.__subscribed_channels:
             channel_id = Messaging.__subscribed_channels[message_data.get('channel_id')]
             # add message to cache
             channel_id[0].append(message_data.get('id'), message_data)
-            # invoke callback
-            channel_id[1]()
+            # tell the view to add the message
+            Messaging.queue.put({
+                'type': 'a', 
+                'data': message_data
+            })
             
     @staticmethod
     def __delete_message(message_data: dict):
@@ -112,8 +115,11 @@ class Messaging:
             channel_id = Messaging.__subscribed_channels[message_data.get('channel_id')]
             # remove message from cache
             channel_id[0].delete(message_data.get('id'))
-            # invoke callback
-            channel_id[1]()
+            # tell the view to remove the message
+            Messaging.queue.put({
+                'type': 'd', 
+                'data': message_data
+            })
 
     @staticmethod
     def __edit_message(message_data: dict):
@@ -124,9 +130,12 @@ class Messaging:
             channel_id = Messaging.__subscribed_channels[message_data.get('channel_id')]
             # edit message in cache
             channel_id[0].edit(message_data.get('id'), message_data)
-            # invoke callback
-            channel_id[1]()
+            # tell the view to edit the message
+            Messaging.queue.put({
+                'type': 'e', 
+                'data': message_data
+            })
 
-    Listener.subscribe_event('MESSAGE_CREATE', __create_message)
+    Listener.subscribe_event('MESSAGE_CREATE', __append_message)
     Listener.subscribe_event('MESSAGE_DELETE', __delete_message)
     Listener.subscribe_event('MESSAGE_UPDATE', __edit_message)

@@ -2,6 +2,7 @@ import json
 from collections import defaultdict
 import threading
 
+from textual import work
 from websockets import ConnectionClosed
 from websocket.connection import Connection
 
@@ -37,7 +38,7 @@ class Listener:
                 
                 # if event has been registered, execute callbacks
                 for callback in Listener.events[reply.get('t')]:
-                    callback(reply.get('d'))
+                   callback(reply.get('d'))
 
             # reconnect on connection closed
             except ConnectionClosed:
