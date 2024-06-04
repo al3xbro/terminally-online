@@ -34,7 +34,7 @@ class Chat(VerticalScroll):
 
     def edit_message(self, message: dict):
         old_message = self.query_one(f'#message-{message["id"]}')
-        old_message.update_content(message['content'])
+        old_message.update_content(message)
 
     def on_mount(self):
         for message in iter(self.messages):

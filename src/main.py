@@ -6,7 +6,7 @@ from textual.widgets import Header
 class TerminallyOnline(App):
 
     CSS_PATH = 'style.tcss'
-    channel_id = '1184053178975662192'
+    channel_id = '1089098339540291627'
 
     def compose(self):
         yield Header()

@@ -14,8 +14,8 @@ class Message(Static):
     def delete(self):
         self.query_one('.content').add_class('deleted')
 
-    def update_content(self, content: str):
-        self.message = { **self.message, 'content': content }
+    def update_content(self, message: dict):
+        self.message = message
 
     def compose(self):
         with Horizontal(classes='message'):
