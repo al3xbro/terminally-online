@@ -44,20 +44,22 @@ class Messaging:
     @staticmethod
     def request_older_messages(channel_id: str) -> None:
         '''Requests old messages from the server before message_id. The channel must be already subscribed to.'''
-        
+
         # get oldest message in cache
         iterator = iter(Messaging.__subscribed_channels[channel_id][0])
 
         # get history
         history = Messaging.__get_message_history(channel_id, before=next(iterator).get('id'))[::-1]
         
-        # add to cache and tell the view to add the message
+        # tell the view to add messages
+        Messaging.queue.put({
+            'type': 'p',
+            'data': history[::-1]
+        })
+
+        # add to cache
         for message in history:
             Messaging.__subscribed_channels[channel_id][0].prepend(message.get('id'), message)
-            Messaging.queue.put({
-                'type': 'p'
-            })
-
 
     @staticmethod
     def send_message(channel_id: str, content: str):

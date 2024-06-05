@@ -1,4 +1,5 @@
 from textual.containers import VerticalScroll
+from textual.scrollbar import ScrollUp
 from views.chat.message import Message
 from models.messaging import Messaging
 
@@ -16,7 +17,7 @@ class Chat(VerticalScroll):
             if update['type'] == 'a':
                 self.create_message(update['data'])
             elif update['type'] == 'p':
-                self.refresh(recompose=True)
+                self.prepend_messages(update['data'])
             elif update['type'] == 'd':
                 self.delete_message(update['data'])
             elif update['type'] == 'e':
@@ -36,9 +37,17 @@ class Chat(VerticalScroll):
         old_message = self.query_one(f'#message-{message["id"]}')
         old_message.update_content(message)
 
+    def prepend_messages(self, messages: list): 
+        self.mount_all([Message(message, id = f'message-{message["id"]}') for message in messages], before=0)
+
+    def action_scroll_up(self) -> None:
+        if self.scroll_offset.y == 0:
+            Messaging.request_older_messages(self.channel)
+        return super().action_scroll_up()
+
     def on_mount(self):
         for message in iter(self.messages):
             self.mount(Message(message, id = f'message-{message["id"]}'))
         self.set_interval(0.1, self.check_for_updates)
         self.scroll_end(animate=False)
-        self.visible = True
+        Messaging.request_older_messages(self.channel)
