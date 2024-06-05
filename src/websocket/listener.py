@@ -2,7 +2,6 @@ import json
 from collections import defaultdict
 import threading
 
-from textual import work
 from websockets import ConnectionClosed
 from websocket.connection import Connection
 

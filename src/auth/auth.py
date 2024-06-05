@@ -13,6 +13,7 @@ class LoginStatus(Enum):
     FAILED_CREDENTIALS = 'failed_login'
     FAILED_MFA = 'failed_mfa'
     INVALID_TOKEN = 'invalid_token'
+    CAPTCHA_REQUIRED = 'captcha_required'
 
 class LogoutStatus(Enum):
     SUCCESS = 'success'
@@ -36,6 +37,9 @@ def login(email: str, password: str, mfa_code: str = None) -> LoginStatus:
                             'undelete': False,
                         }), 
                         headers = headers | {'referer': 'https://discord.com/login'})
+
+    if res.json().get('captcha_key'):
+        return LoginStatus.CAPTCHA_REQUIRED
 
     # verify ip
     if res.json().get('errors') and res.json().get('errors').get('login').get('_errors')[0].get('code') == 'ACCOUNT_LOGIN_VERIFICATION_EMAIL':
@@ -83,10 +87,19 @@ def logout() -> LogoutStatus:
                         }))
     
     if res.status_code == 204:
+        os.remove(TOKEN_PATH)
         return LogoutStatus.SUCCESS
     return LogoutStatus.FAILED
 
 def get_token() -> str:
     '''Returns the login token'''
+    
+    if not logged_in():
+        return None
     with open(TOKEN_PATH, 'r') as f:
         return f.read()
+    
+def logged_in() -> bool:
+    '''Returns whether the user is logged in'''
+
+    return os.path.exists(TOKEN_PATH)

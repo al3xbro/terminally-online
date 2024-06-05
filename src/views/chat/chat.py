@@ -39,6 +39,7 @@ class Chat(VerticalScroll):
 
     def prepend_messages(self, messages: list): 
         self.mount_all([Message(message, id = f'message-{message["id"]}') for message in messages], before=0)
+        self.scroll_to(0, 49, animate=False)
 
     def action_scroll_up(self) -> None:
         if self.scroll_offset.y == 0:
