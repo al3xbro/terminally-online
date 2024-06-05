@@ -9,6 +9,7 @@ class Listener:
     
     # { event_id: [callback] }
     events = defaultdict(lambda: list())
+    ready = False
     reconnect_url = None
     session_id = None
 
@@ -34,6 +35,7 @@ class Listener:
                 if reply.get('t') == 'READY':
                     Listener.reconnect_url = reply.get('d').get('resume_gateway_url')
                     Listener.session_id = reply.get('d').get('session_id')
+                    Listener.ready = True
                 
                 # if event has been registered, execute callbacks
                 for callback in Listener.events[reply.get('t')]:

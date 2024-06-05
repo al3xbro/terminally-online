@@ -3,7 +3,7 @@
 }
 
 .username {
-    width: 10;
+    width: 20;
 }
 
 .timestamp {

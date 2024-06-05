@@ -1,21 +1,25 @@
+import time
 from textual.app import App
 from auth import auth
 from views.chat.chat import Chat
 from views.input.input import ChatInput
 from textual.widgets import Header
+from websocket.listener import Listener
 
 class TerminallyOnline(App):
 
     CSS_PATH = 'style.tcss'
-    channel_id = '1089098339540291627'
-
+    guild_id = '1184053178380079175'
+    channel_id = '1184053178975662192'
 
     def compose(self):
         yield Header()
-        yield Chat(self.channel_id)
+        yield Chat(self.guild_id, self.channel_id)
         yield ChatInput(self.channel_id)
 
 if __name__ == '__main__':
+    while not Listener.ready:
+        time.sleep(0.5)
 
     while not auth.logged_in():
         print('u need to login.')
@@ -25,6 +29,6 @@ if __name__ == '__main__':
         status = auth.login(email, pw, mfa if mfa != '' else None)
         if (status != auth.LoginStatus.SUCCESS):
             print('login failed.', status, '\n')
-
+        
     app = TerminallyOnline()
     app.run()
