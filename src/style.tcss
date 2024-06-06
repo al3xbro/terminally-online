@@ -1,17 +1,24 @@
 .message {
-    height: 1;
+    height: auto;
+}
+
+.content {
+    width: 0.75fr;
+}
+
+.message-content {
+    width: 0.75fr;
+    height: auto;
 }
 
 .username {
+    height: 1;
     width: 20;
 }
 
 .timestamp {
-    dock: right;
-    color: $primary-background;
-}
-
-.edited {
+    width: 0.25fr;
+    text-align: right;
     color: $primary-background;
 }
 

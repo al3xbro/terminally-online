@@ -1,3 +1,4 @@
+import json
 import time
 from textual.app import App
 from auth import auth
@@ -20,7 +21,7 @@ class TerminallyOnline(App):
 if __name__ == '__main__':
     while not Listener.ready:
         time.sleep(0.5)
-
+    
     while not auth.logged_in():
         print('u need to login.')
         email = input('enter email: ')

@@ -7,6 +7,7 @@ from models.messaging import Messaging
 class Chat(VerticalScroll):
 
     users = {}
+    scroll_enabled = True
 
     def __init__(self, guild: str,  channel: str):
         super().__init__()
@@ -40,21 +41,16 @@ class Chat(VerticalScroll):
                         nick = ''
                         if member['nick']:
                             nick = member['nick']
-                        elif member['user']['display_name']:
-                            nick = member['user']['display_name']
                         else:
-                            nick = member['user']['username']
+                            nick = member['user']['display_name']
 
                         # set color
                         if member['roles'] == []:
                             Guilds.guilds[guild['name']]['members'][member['user']['username']]['color'] = 0
                             continue
                         
+                        max_position = 0
                         max_role = {}
-                        for role in guild['roles']:
-                            if role['id'] == member['roles'][0]:
-                                max_role = role
-                                break
 
                         for role_id in member['roles']:
                             challenging_role = {}
@@ -62,20 +58,25 @@ class Chat(VerticalScroll):
                                 if role['id'] == role_id:
                                     challenging_role = role
                                     break
-                            if challenging_role['position'] > max_role['position']:
+                            if challenging_role['color'] != 0 and challenging_role['position'] > max_position:
+                                max_position = challenging_role['position']
                                 max_role = challenging_role
                         self.users[username]['nick'] = nick
                         self.users[username]['color'] = max_role['color']
                         return
                     
+                # member does not exist
+                self.users[username]['nick'] = username
+                break
+                    
     def create_message(self, message: dict):
-        if message['author']['username'] not in self.users:
-            self.log_user(message['author']['username'])
         try:
+            if message['author']['username'] not in self.users:
+                print(message)
+                self.log_user(message['author']['username'])
             self.mount(Message(message, self.users[message['author']['username']]['nick'], self.users[message['author']['username']]['color'], id = f'message-{message["id"]}'))
         except:
             self.mount(Message(message, '', 0, id = f'message-{message["id"]}'))
-        self.scroll_end(animate=False)
 
     def delete_message(self, message: dict):
         old_message = self.query_one(f'#message-{message["id"]}')
@@ -90,11 +91,15 @@ class Chat(VerticalScroll):
             if message['author']['username'] not in self.users:
                 self.log_user(message['author']['username'])
         self.mount_all([Message(message, self.users[message['author']['username']]['nick'], self.users[message['author']['username']]['color'], id = f'message-{message["id"]}') for message in messages], before=0)
-        self.scroll_to(0, 49, animate=False)
 
     def action_scroll_up(self) -> None:
+        if not self.scroll_enabled:
+            return
         if self.scroll_offset.y == 0:
+            self.scroll_enabled = False
             Messaging.request_older_messages(self.channel)
+            self.scroll_to(0, 49)
+            self.set_timer(1, lambda: setattr(self, 'scroll_enabled', True))
         return super().action_scroll_up()
     
     async def on_mount(self):
