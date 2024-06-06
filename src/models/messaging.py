@@ -49,7 +49,7 @@ class Messaging:
         iterator = iter(Messaging.__subscribed_channels[channel_id][0])
 
         # get history
-        history = Messaging.__get_message_history(channel_id, before=next(iterator).get('id'))[::-1]
+        history = Messaging.__get_message_history(channel_id, before=next(iterator).get('id'), limit=25)[::-1]
         
         # tell the view to add messages
         Messaging.queue.put({
@@ -78,7 +78,7 @@ class Messaging:
         return False
     
     @staticmethod
-    def __get_message_history(channel_id: str, limit: int = 50, before: str = None) -> list:
+    def __get_message_history(channel_id: str, limit: int = 100, before: str = None) -> list:
         '''Returns a list of past messages in the current channel.'''
 
         # send request

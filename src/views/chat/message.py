@@ -32,7 +32,10 @@ class Message(Static):
         with Horizontal(classes='message'):
             with Horizontal(classes='message-content'):
                 yield name
-                yield Label(self.message['content'] + (' (edited)' if self.message.get('edited_timestamp') else ''), classes='content', shrink=True)
+                yield Label((self.message['content'] if self.message['content'] else '') + 
+                            (' (edited)' if self.message.get('edited_timestamp') else ''),
+                              classes='content', shrink=True
+                )
             yield Label(datetime.fromisoformat(self.message['timestamp']).strftime('%m-%d-%Y %H:%M:%S'), classes='timestamp')
 
         

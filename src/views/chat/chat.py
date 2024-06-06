@@ -1,4 +1,5 @@
 from textual.containers import VerticalScroll
+from textual.events import MouseScrollUp
 from textual.scrollbar import ScrollUp
 from models.guilds import Guilds
 from views.chat.message import Message
@@ -95,12 +96,22 @@ class Chat(VerticalScroll):
     def action_scroll_up(self) -> None:
         if not self.scroll_enabled:
             return
-        if self.scroll_offset.y == 0:
+        if self.scroll_offset.y < 2:
             self.scroll_enabled = False
             Messaging.request_older_messages(self.channel)
-            self.scroll_to(0, 49)
+            self.scroll_to(0, 25)
             self.set_timer(1, lambda: setattr(self, 'scroll_enabled', True))
         return super().action_scroll_up()
+    
+    def _on_mouse_scroll_up(self, event: MouseScrollUp) -> None:
+        if not self.scroll_enabled:
+            return
+        if self.scroll_offset.y < 2:
+            self.scroll_enabled = False
+            Messaging.request_older_messages(self.channel)
+            self.scroll_to(0, 25)
+            self.set_timer(1, lambda: setattr(self, 'scroll_enabled', True))
+        return super()._on_mouse_scroll_up(event)
     
     async def on_mount(self):
         for message in iter(self.messages):
