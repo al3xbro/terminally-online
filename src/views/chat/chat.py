@@ -7,6 +7,7 @@ from models.messaging import Messaging
 
 class Chat(VerticalScroll):
 
+    # TODO: move to messaging model
     users = {}
     scroll_enabled = True
 
@@ -73,9 +74,11 @@ class Chat(VerticalScroll):
     def create_message(self, message: dict):
         try:
             if message['author']['username'] not in self.users:
-                print(message)
                 self.log_user(message['author']['username'])
             self.mount(Message(message, self.users[message['author']['username']]['nick'], self.users[message['author']['username']]['color'], id = f'message-{message["id"]}'))
+            print(self.scrollable_content_region.height, self.scroll_offset.y)
+            if self.scrollable_content_region.height - self.scroll_offset.y < 10:
+                self.scroll_end(animate=True)
         except:
             self.mount(Message(message, '', 0, id = f'message-{message["id"]}'))
 
@@ -93,25 +96,28 @@ class Chat(VerticalScroll):
                 self.log_user(message['author']['username'])
         self.mount_all([Message(message, self.users[message['author']['username']]['nick'], self.users[message['author']['username']]['color'], id = f'message-{message["id"]}') for message in messages], before=0)
 
+    # FIXME: a few seconds after load, request doesnt work
     def action_scroll_up(self) -> None:
         if not self.scroll_enabled:
             return
-        if self.scroll_offset.y < 2:
+        if self.scroll_offset.y == 0:
             self.scroll_enabled = False
             Messaging.request_older_messages(self.channel)
-            self.scroll_to(0, 25)
+            self.scroll_to(0, 24, animate=False) 
             self.set_timer(1, lambda: setattr(self, 'scroll_enabled', True))
-        return super().action_scroll_up()
+        else:
+            super().action_scroll_up()
     
     def _on_mouse_scroll_up(self, event: MouseScrollUp) -> None:
         if not self.scroll_enabled:
             return
-        if self.scroll_offset.y < 2:
+        if self.scroll_offset.y == 0:
             self.scroll_enabled = False
             Messaging.request_older_messages(self.channel)
-            self.scroll_to(0, 25)
+            self.scroll_to(0, 24, animate=False)
             self.set_timer(1, lambda: setattr(self, 'scroll_enabled', True))
-        return super()._on_mouse_scroll_up(event)
+        else:
+            super()._on_mouse_scroll_up(event)
     
     async def on_mount(self):
         for message in iter(self.messages):

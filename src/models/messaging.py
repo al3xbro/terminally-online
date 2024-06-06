@@ -47,18 +47,19 @@ class Messaging:
 
         # get oldest message in cache
         iterator = iter(Messaging.__subscribed_channels[channel_id][0])
+        oldest_message = next(iterator)
 
         # get history
-        history = Messaging.__get_message_history(channel_id, before=next(iterator).get('id'), limit=25)[::-1]
+        history = Messaging.__get_message_history(channel_id, before=oldest_message.get('id'), limit=25)
         
         # tell the view to add messages
         Messaging.queue.put({
             'type': 'p',
-            'data': history[::-1]
+            'data': history
         })
 
         # add to cache
-        for message in history:
+        for message in history[::-1]:
             Messaging.__subscribed_channels[channel_id][0].prepend(message.get('id'), message)
 
     @staticmethod
