@@ -1,4 +1,4 @@
-from textual.widgets import Label, Static, Markdown, TextArea
+from textual.widgets import Label, Static
 from textual.reactive import reactive
 from textual.containers import Horizontal
 from textual.color import Color
@@ -26,16 +26,14 @@ class Message(Static):
         return Color(colors[0], colors[1], colors[2])
 
     def compose(self):
-        name = Label(f"{self.nick if self.nick else self.message['author']['username']}: ", classes='username')
+        name = Label(f"{self.nick if self.nick else self.message['author']['username']}:", classes='username')
         name.styles.color = self.decimal_to_rgb(self.color)
 
         with Horizontal(classes='message'):
             with Horizontal(classes='message-content'):
                 yield name
-                yield Label((self.message['content'] if self.message['content'] else '') + 
+                yield Label((self.message['content'] if 'content' in self.message else '') + 
                             (' (edited)' if self.message.get('edited_timestamp') else ''),
                               classes='content', shrink=True
                 )
             yield Label(datetime.fromisoformat(self.message['timestamp']).strftime('%m-%d-%Y %H:%M:%S'), classes='timestamp')
-
-        

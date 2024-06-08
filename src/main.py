@@ -1,4 +1,3 @@
-import json
 import time
 from textual.app import App
 from auth import auth

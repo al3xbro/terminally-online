@@ -92,6 +92,7 @@ class Messaging:
     
     @staticmethod
     def __log_user(channel_id: str, username: str):
+        '''Logs a user's nickname and color in the channel.'''
 
         if username in Messaging.__subscribed_channels[channel_id][1]:
             return

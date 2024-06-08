@@ -4,6 +4,8 @@
 
 .content {
     width: 0.75fr;
+    padding-left: 1;
+    padding-right: 2;
 }
 
 .message-content {

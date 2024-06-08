@@ -31,23 +31,33 @@ class Chat(VerticalScroll):
             pass
               
     def create_message(self, message: dict):
+        '''Adds a message to the chat.'''
+
         self.mount(Message(message, Messaging.get_users(self.channel_id)[message['author']['username']]['nick'], Messaging.get_users(self.channel_id)[message['author']['username']]['color'], id = f'message-{message["id"]}'))
         if self.scrollable_content_region.height - self.scroll_offset.y < 10:
             self.scroll_end(animate=True)
 
     def delete_message(self, message: dict):
+        '''Deletes a message from the chat.'''
+
         old_message = self.query_one(f'#message-{message["id"]}')
         old_message.delete()
 
     def edit_message(self, message: dict):
+        '''Edits a message in the chat.'''
+
         old_message = self.query_one(f'#message-{message["id"]}')
         old_message.update_content(message)
 
     def prepend_messages(self, messages: list): 
+        '''Prepends messages to the chat.'''
+
         self.mount_all([Message(message, Messaging.get_users(self.channel_id)[message['author']['username']]['nick'], Messaging.get_users(self.channel_id)[message['author']['username']]['color'], id = f'message-{message["id"]}') for message in messages], before=0)
         self.scroll_enabled = True
 
     def action_scroll_up(self) -> None:
+        '''Scrolls up in the chat. If the scroll offset is 0, it will request older messages.'''
+
         if not self.scroll_enabled:
             return
         if self.scroll_offset.y == 0:
@@ -59,6 +69,8 @@ class Chat(VerticalScroll):
             super().action_scroll_up()
     
     def _on_mouse_scroll_up(self, event: MouseScrollUp) -> None:
+        '''Scrolls up in the chat. If the scroll offset is 0, it will request older messages.'''
+
         if not self.scroll_enabled:
             return
         if self.scroll_offset.y == 0:
