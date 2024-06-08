@@ -2,6 +2,7 @@ from queue import Queue
 import requests
 import json
 from utils.mlist import MessageList
+from models.guilds import Guilds
 
 from auth import auth
 from websocket.listener import Listener
@@ -14,13 +15,13 @@ f.close()
 class Messaging:
     
     # { 
-    #     channel_id: MessageList
+    #     channel_id: (MessageList, users, guild_id)
     # }
     __subscribed_channels = {}
     queue = Queue()
 
     @staticmethod
-    def subscribe_channel(channel_id: str) -> None:
+    def subscribe_channel(guild_id: str, channel_id: str) -> None:
         '''Add a channel to a list of subscribed channels. The callback function is invoked when a new message is received.'''
 
         # check if already subscribed
@@ -31,15 +32,22 @@ class Messaging:
         history = Messaging.__get_message_history(channel_id)
 
         # add to cache
-        Messaging.__subscribed_channels[channel_id] = (
-            MessageList(history),
-        )
+        Messaging.__subscribed_channels[channel_id] = (MessageList(history), {}, guild_id)
+        # get users
+        for message in history:
+            Messaging.__log_user(channel_id, message['author']['username'])
 
     @staticmethod
     def get_messages(channel_id: str) -> list:
         '''Returns the list of messages in the current channel. The channel must be already subscribed to.'''
 
         return Messaging.__subscribed_channels[channel_id][0] # TODO: change based on cache eviction policy
+    
+    @staticmethod
+    def get_users(channel_id: str) -> dict:
+        '''Returns the list of users in the current channel. The channel must be already subscribed to.'''
+
+        return Messaging.__subscribed_channels[channel_id][1]
 
     @staticmethod
     def request_older_messages(channel_id: str) -> None:
@@ -52,6 +60,10 @@ class Messaging:
         # get history
         history = Messaging.__get_message_history(channel_id, before=oldest_message.get('id'), limit=25)
         
+        # get users
+        for message in history:
+            Messaging.__log_user(channel_id, message['author']['username'])
+
         # tell the view to add messages
         Messaging.queue.put({
             'type': 'p',
@@ -79,6 +91,57 @@ class Messaging:
         return False
     
     @staticmethod
+    def __log_user(channel_id: str, username: str):
+
+        if username in Messaging.__subscribed_channels[channel_id][1]:
+            return
+        
+        user = {}
+
+        for guild in Guilds.get_guilds():
+            if guild['id'] == Messaging.__subscribed_channels[channel_id][2]:
+                for member in guild['members']:
+                    if member['user']['username'] == username:
+
+                        user['nick'] = ''
+                        user['color'] = 0
+
+                        # set nick
+                        if member['nick']:
+                            user['nick'] = member['nick']
+                        else:
+                            user['nick'] = member['user']['display_name']
+
+                        # set color
+                        if member['roles'] == []:
+                            user['color'] = 0
+                            Messaging.__subscribed_channels[channel_id][1][username] = user
+                            return
+                        
+                        max_position = 0
+                        max_role = {}
+
+                        for role_id in member['roles']:
+                            challenging_role = {}
+                            for role in guild['roles']:
+                                if role['id'] == role_id:
+                                    challenging_role = role
+                                    break
+                            if challenging_role['color'] != 0 and challenging_role['position'] > max_position:
+                                max_position = challenging_role['position']
+                                max_role = challenging_role
+                        user['color'] = max_role['color']
+
+                        Messaging.__subscribed_channels[channel_id][1][username] = user
+                        return
+                    
+                # if user is not found
+                user['nick'] = ''
+                user['color'] = 0
+                Messaging.__subscribed_channels[channel_id][1][username] = user
+                return
+            
+    @staticmethod
     def __get_message_history(channel_id: str, limit: int = 100, before: str = None) -> list:
         '''Returns a list of past messages in the current channel.'''
 
@@ -100,9 +163,9 @@ class Messaging:
         '''Recieves a message from the websocket.'''
 
         if message_data.get('channel_id') in Messaging.__subscribed_channels:
-            channel_id = Messaging.__subscribed_channels[message_data.get('channel_id')]
+            channel = Messaging.__subscribed_channels[message_data.get('channel_id')]
             # add message to cache
-            channel_id[0].append(message_data.get('id'), message_data)
+            channel[0].append(message_data.get('id'), message_data)
             # tell the view to add the message
             Messaging.queue.put({
                 'type': 'a', 
@@ -115,9 +178,9 @@ class Messaging:
 
         if message_data.get('channel_id') in Messaging.__subscribed_channels:
             # get record from cache
-            channel_id = Messaging.__subscribed_channels[message_data.get('channel_id')]
+            channel = Messaging.__subscribed_channels[message_data.get('channel_id')]
             # remove message from cache
-            channel_id[0].delete(message_data.get('id'))
+            channel[0].delete(message_data.get('id'))
             # tell the view to remove the message
             Messaging.queue.put({
                 'type': 'd', 
@@ -130,9 +193,9 @@ class Messaging:
 
         if message_data.get('channel_id') in Messaging.__subscribed_channels:
             # get record from cache
-            channel_id = Messaging.__subscribed_channels[message_data.get('channel_id')]
+            channel = Messaging.__subscribed_channels[message_data.get('channel_id')]
             # edit message in cache
-            channel_id[0].edit(message_data.get('id'), message_data)
+            channel[0].edit(message_data.get('id'), message_data)
             # tell the view to edit the message
             Messaging.queue.put({
                 'type': 'e', 

@@ -87,7 +87,6 @@ class MessageList:
         
         node.message = new_message
 
-    # TODO: find a better way to implement this
     def __iter__(self):
         '''Return an iterator for the list.'''
         self.node = self.head

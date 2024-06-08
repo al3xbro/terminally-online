@@ -28,7 +28,6 @@
 
 Chat {
     padding: 2;
-    padding-right: 0;
 }
 
 CommandInput {
