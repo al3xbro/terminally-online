@@ -24,6 +24,9 @@ class Message(Static):
         hex_color = "{:06x}".format(decimal_color)
         colors = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
         return Color(colors[0], colors[1], colors[2])
+    
+    def parse_timestamp(self, timestamp):
+        return datetime.fromisoformat(timestamp).astimezone().strftime('%m-%d-%Y %H:%M:%S')
 
     def compose(self):
         name = Label(f"{self.nick if self.nick else self.message['author']['username']}:", classes='username')
@@ -36,4 +39,5 @@ class Message(Static):
                             (' (edited)' if self.message.get('edited_timestamp') else ''),
                               classes='content', shrink=True
                 )
-            yield Label(datetime.fromisoformat(self.message['timestamp']).strftime('%m-%d-%Y %H:%M:%S'), classes='timestamp')
+                
+            yield Label(self.parse_timestamp(self.message['timestamp']), classes='timestamp')
