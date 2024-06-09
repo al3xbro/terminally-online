@@ -44,7 +44,7 @@ class Listener:
             # reconnect on connection closed
             except ConnectionClosed:
                 try:
-                    Connection.reconnect_websocket(Connection.reconnect_url, Connection.session_id)
+                    Connection.reconnect_websocket(Listener.reconnect_url, Listener.session_id)
                 except:
                     Connection.reconnect_websocket(Connection.gateway_url)
 
