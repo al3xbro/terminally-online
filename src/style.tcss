@@ -37,3 +37,30 @@ CommandInput {
    margin-right: 2;
    margin-bottom: 2;
 }
+
+.delete_button {
+    background: #ff4a4a;
+    height: 1;
+    width: 3;
+    text-align: center;
+}
+
+.edit_button {
+    background: #ffc640;
+    height: 1;
+    width: 3;
+    text-align: center;
+}
+
+.reply_button {
+    background: #619eff;
+    height: 1;
+    width: 3;
+    text-align: center;
+}
+
+.options {
+    width: 0.25fr;
+    align: right middle;
+    height: 1;
+}

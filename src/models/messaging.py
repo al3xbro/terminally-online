@@ -91,6 +91,37 @@ class Messaging:
         return False
     
     @staticmethod
+    def delete_message(channel_id: str, message_id: str):
+        '''Deletes a message from the channel.'''
+
+        # send request
+        res = requests.delete(
+            url = f'https://discord.com/api/v9/channels/{channel_id}/messages/{message_id}', 
+            headers = headers | { 'authorization': auth.get_token() }
+        )
+
+        # return status TODO: better error handling and documentation
+        if res.status_code == 204:
+            return True
+        return False
+    
+    @staticmethod
+    def edit_message(channel_id: str, message_id: str, content: str):
+        '''Edits a message in the channel.'''
+
+        # send request
+        res = requests.patch(
+            url = f'https://discord.com/api/v9/channels/{channel_id}/messages/{message_id}', 
+            headers = headers | { 'authorization': auth.get_token() },
+            data = json.dumps({ 'content': content })
+        )
+
+        # return status TODO: better error handling and documentation
+        if res.status_code == 200:
+            return True
+        return False
+    
+    @staticmethod
     def __log_user(channel_id: str, username: str):
         '''Logs a user's nickname and color in the channel.'''
 
@@ -160,8 +191,8 @@ class Messaging:
             return []
 
     @staticmethod
-    def __append_message(message_data: dict):
-        '''Recieves a message from the websocket.'''
+    def __append_message_list(message_data: dict):
+        '''Adds a message to the MessageList and tells view to update.'''
 
         if message_data.get('channel_id') in Messaging.__subscribed_channels:
             channel = Messaging.__subscribed_channels[message_data.get('channel_id')]
@@ -174,8 +205,8 @@ class Messaging:
             })
             
     @staticmethod
-    def __delete_message(message_data: dict):
-        '''Recieves a message from the websocket.'''
+    def __delete_message_list(message_data: dict):
+        '''Deletes a message from the MessageList and tells view to update.'''
 
         if message_data.get('channel_id') in Messaging.__subscribed_channels:
             # get record from cache
@@ -189,8 +220,8 @@ class Messaging:
             })
 
     @staticmethod
-    def __edit_message(message_data: dict):
-        '''Recieves a message from the websocket.'''
+    def __edit_message_list(message_data: dict):
+        '''Edits a message from the MessageList and tells view to update.'''
 
         if message_data.get('channel_id') in Messaging.__subscribed_channels:
             # get record from cache
@@ -203,6 +234,6 @@ class Messaging:
                 'data': message_data
             })
 
-    Listener.subscribe_event('MESSAGE_CREATE', __append_message)
-    Listener.subscribe_event('MESSAGE_DELETE', __delete_message)
-    Listener.subscribe_event('MESSAGE_UPDATE', __edit_message)
+    Listener.subscribe_event('MESSAGE_CREATE', __append_message_list)
+    Listener.subscribe_event('MESSAGE_DELETE', __delete_message_list)
+    Listener.subscribe_event('MESSAGE_UPDATE', __edit_message_list)

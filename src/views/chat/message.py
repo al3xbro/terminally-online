@@ -3,9 +3,12 @@ from textual.reactive import reactive
 from textual.containers import Horizontal
 from textual.color import Color
 from datetime import datetime
+from views.chat.delete_button import DeleteButton
+from models.user import User
 
 class Message(Static):
 
+    show_options = reactive(False, recompose=True)
     message = reactive('', recompose=True)
 
     def __init__(self, message, nick, color, *args, **kwargs):
@@ -27,10 +30,14 @@ class Message(Static):
     
     def parse_timestamp(self, timestamp):
         return datetime.fromisoformat(timestamp).astimezone().strftime('%m-%d-%Y %H:%M:%S')
-
+    
     def compose(self):
         name = Label(f"{self.nick if self.nick else self.message['author']['username']}:", classes='username')
         name.styles.color = self.decimal_to_rgb(self.color)
+
+        delete = DeleteButton(self.message)
+        edit = Label('e', classes='edit_button')
+        reply = Label('r', classes='reply_button')
 
         with Horizontal(classes='message'):
             with Horizontal(classes='message-content'):
@@ -39,5 +46,4 @@ class Message(Static):
                             (' (edited)' if self.message.get('edited_timestamp') else ''),
                               classes='content', shrink=True
                 )
-                
-            yield Label(self.parse_timestamp(self.message['timestamp']), classes='timestamp')
+            yield (Horizontal(reply, edit, delete, classes='options') if self.message['author']['username'] == User.get_username() else Horizontal(reply, classes='options')) if self.show_options else Label(self.parse_timestamp(self.message['timestamp']), classes='timestamp')              
