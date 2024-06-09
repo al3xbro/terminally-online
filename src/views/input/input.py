@@ -1,5 +1,4 @@
-from textual import work
-from textual.widgets import Input, Static
+from textual.widgets import Input
 from models.messaging import Messaging
 
 class ChatInput(Input):
@@ -15,5 +14,6 @@ class ChatInput(Input):
         Messaging.send_message(self.channel_id, value)
 
     def on_input_submitted(self):
-        self.run_worker(self.submit_message(self.value))
+        value = self.value
         self.value = ''
+        self.run_worker(self.submit_message(value))

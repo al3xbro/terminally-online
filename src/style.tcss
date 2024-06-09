@@ -2,6 +2,10 @@
     height: auto;
 }
 
+.message:hover {
+    background: $primary-background;
+}
+
 .content {
     width: 0.75fr;
     padding-left: 1;

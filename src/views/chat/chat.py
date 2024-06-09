@@ -33,7 +33,7 @@ class Chat(VerticalScroll):
     def create_message(self, message: dict):
         '''Adds a message to the chat.'''
 
-        self.mount(Message(message, Messaging.get_users(self.channel_id)[message['author']['username']]['nick'], Messaging.get_users(self.channel_id)[message['author']['username']]['color'], id = f'message-{message["id"]}'))
+        self.mount(Message(message, Messaging.get_users(self.channel_id)[message['author']['username']]['nick'], Messaging.get_users(self.channel_id)[message['author']['username']]['color'], id = f'message-{message["id"]}', classes='message'))
         if self.scrollable_content_region.height - self.scroll_offset.y < 10:
             self.scroll_end(animate=True)
 
@@ -80,7 +80,7 @@ class Chat(VerticalScroll):
             self.set_timer(1, lambda: setattr(self, 'scroll_enabled', True))
         else:
             super()._on_mouse_scroll_up(event)
-    
+
     async def on_mount(self):
         for message in iter(self.messages):
             self.create_message(message)
