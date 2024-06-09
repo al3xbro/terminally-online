@@ -1,9 +1,10 @@
-from textual.widgets import Label, Static
+from textual import on
+from textual.widgets import Label, Static, Button
 from textual.reactive import reactive
 from textual.containers import Horizontal
 from textual.color import Color
 from datetime import datetime
-from views.chat.delete_button import DeleteButton
+from models.messaging import Messaging
 from models.user import User
 
 class Message(Static):
@@ -31,13 +32,23 @@ class Message(Static):
     def parse_timestamp(self, timestamp):
         return datetime.fromisoformat(timestamp).astimezone().strftime('%m-%d-%Y %H:%M:%S')
     
+    def on_enter(self):
+        self.show_options = True
+
+    def on_leave(self):
+        self.show_options = False
+    
     def compose(self):
         name = Label(f"{self.nick if self.nick else self.message['author']['username']}:", classes='username')
         name.styles.color = self.decimal_to_rgb(self.color)
 
-        delete = DeleteButton(self.message)
-        edit = Label('e', classes='edit_button')
-        reply = Label('r', classes='reply_button')
+        delete = Button('d', classes='delete_button')
+        edit = Button('e', classes='edit_button')
+        reply = Button('r', classes='reply_button')
+
+        @on(Button.Pressed, '.delete_button')
+        def delete_message():
+            Messaging.delete_message(self.message['id'])
 
         with Horizontal(classes='message'):
             with Horizontal(classes='message-content'):

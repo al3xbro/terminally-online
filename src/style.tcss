@@ -39,21 +39,27 @@ CommandInput {
 }
 
 .delete_button {
+    border: none;
     background: #ff4a4a;
+    min-width: 0;
     height: 1;
     width: 3;
     text-align: center;
 }
 
 .edit_button {
+    border: none;
     background: #ffc640;
+    min-width: 0;
     height: 1;
     width: 3;
     text-align: center;
 }
 
 .reply_button {
+    border: none;
     background: #619eff;
+    min-width: 0;
     height: 1;
     width: 3;
     text-align: center;
