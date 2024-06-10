@@ -123,7 +123,7 @@ class Messaging:
     
     @staticmethod
     def __log_user(channel_id: str, username: str):
-        '''Logs a user's nickname and color in the channel.'''
+        '''Logs a user's nickname, color, and roles in the channel.'''
 
         if username in Messaging.__subscribed_channels[channel_id][1]:
             return
@@ -147,6 +147,7 @@ class Messaging:
                         # set color
                         if member['roles'] == []:
                             user['color'] = 0
+                            user['roles'] = []
                             Messaging.__subscribed_channels[channel_id][1][username] = user
                             return
                         
@@ -162,7 +163,10 @@ class Messaging:
                             if challenging_role['color'] != 0 and challenging_role['position'] > max_position:
                                 max_position = challenging_role['position']
                                 max_role = challenging_role
-                        user['color'] = max_role['color']
+                        user['color'] = max_role['color'] if max_role != {} else 0
+                        
+                        # set roles
+                        user['roles'] = member['roles']
 
                         Messaging.__subscribed_channels[channel_id][1][username] = user
                         return
@@ -170,6 +174,7 @@ class Messaging:
                 # if user is not found
                 user['nick'] = ''
                 user['color'] = 0
+                user['roles'] = []
                 Messaging.__subscribed_channels[channel_id][1][username] = user
                 return
             

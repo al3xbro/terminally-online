@@ -9,8 +9,8 @@ from websocket.listener import Listener
 class TerminallyOnline(App):
 
     CSS_PATH = 'style.tcss'
-    guild_id = '1184053178380079175'
-    channel_id = '1184053178975662192'
+    guild_id = '832033238004138004'
+    channel_id = '832033238004138006'
 
     def compose(self):
         yield Header()

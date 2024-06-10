@@ -39,8 +39,15 @@ class Message(Horizontal):
     def on_leave(self):
         self.show_options = False
 
-    @on('delete_button', 'click')
-    
+    def is_mention(self):
+        for mention in self.message['mentions']:
+            if mention['username'] == User.get_username():
+                return True
+        for role_id in self.message['mention_roles']:
+            if role_id in Messaging.get_users(self.message['channel_id'])[User.get_username()]['roles']:
+                return True
+        return self.message['mention_everyone']
+
     def compose(self):
         name = Label(f"{self.nick if self.nick else self.message['author']['username']}:", classes='username')
         name.styles.color = self.decimal_to_rgb(self.color)
@@ -49,6 +56,7 @@ class Message(Horizontal):
                         (' (edited)' if self.message.get('edited_timestamp') else ''),
                             classes='content', shrink=True)
         if self.deleted: content.add_class('deleted')
+        if self.is_mention(): content.add_class('highlight')
 
         delete = Button('d', classes='delete_button')
         edit = Button('e', classes='edit_button')
