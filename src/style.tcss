@@ -1,4 +1,35 @@
 .message {
+    width: 1fr;
+    height: auto;
+}
+
+.message_options {
+    height: 1;
+    width: 0.25fr;
+}
+
+.options {
+    align-horizontal: right;
+    padding-right: 1;
+}
+
+.timestamp {
+    color: $primary-background;
+}
+
+.username {
+    width: 20;
+}
+
+.content {
+    height: auto;
+    width: 0.75fr;
+    padding-left: 1;
+    padding-right: 1;
+}
+
+.message_content {
+    width: 0.75fr;
     height: auto;
 }
 
@@ -6,45 +37,10 @@
     background: $secondary;
 }
 
-.message:hover {
-    background: $primary-background;
-}
-
-.content {
-    width: 0.75fr;
-    padding-left: 1;
-    padding-right: 2;
-}
-
-.message-content {
-    width: 0.75fr;
-    height: auto;
-}
-
-.username {
-    height: 1;
-    width: 20;
-}
-
-.timestamp {
-    width: 0.25fr;
-    text-align: right;
-    color: $primary-background;
-}
-
 .deleted {
     color: #ff4a4a;
 }
 
-Chat {
-    padding: 2;
-}
-
-CommandInput {
-   margin-left: 2;
-   margin-right: 2;
-   margin-bottom: 2;
-}
 
 .delete_button {
     border: none;
@@ -53,8 +49,8 @@ CommandInput {
     height: 1;
     width: 3;
     text-align: center;
-}
-
+    }
+    
 .edit_button {
     border: none;
     background: #ffc640;
@@ -73,8 +69,12 @@ CommandInput {
     text-align: center;
 }
 
-.options {
-    width: 0.25fr;
-    align: right middle;
-    height: 1;
+Chat {
+    padding: 2;
+}
+
+CommandInput {
+    margin-left: 2;
+    margin-right: 2;
+    margin-bottom: 2;
 }

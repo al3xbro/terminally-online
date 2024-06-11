@@ -31,7 +31,7 @@ class Message(Horizontal):
         return Color(colors[0], colors[1], colors[2])
     
     def parse_timestamp(self, timestamp):
-        return datetime.fromisoformat(timestamp).astimezone().strftime('%m-%d-%Y %H:%M:%S')
+        return datetime.fromisoformat(timestamp).astimezone().strftime('%H:%M:%S')
     
     def on_enter(self):
         self.show_options = True
@@ -58,11 +58,13 @@ class Message(Horizontal):
         if self.deleted: content.add_class('deleted')
         if self.is_mention(): content.add_class('highlight')
 
-        delete = Button('d', classes='delete_button')
-        edit = Button('e', classes='edit_button')
         reply = Button('r', classes='reply_button')
+        edit = Button('e', classes='edit_button')
+        delete = Button('d', classes='delete_button')
 
-        with Horizontal(classes='message-content'):
+        with Horizontal(classes='message_content'):
             yield name
             yield content
-        yield (Horizontal(reply, edit, delete, classes='options') if self.message['author']['username'] == User.get_username() else Horizontal(reply, classes='options')) if self.show_options else Label(self.parse_timestamp(self.message['timestamp']), classes='timestamp')              
+        with Horizontal(classes='message_options'):
+            yield (Horizontal(delete, edit, reply, classes='options') if self.message['author']['username'] == User.get_username() else Horizontal(reply, classes='options'))
+            yield Label(self.parse_timestamp(self.message['timestamp']), classes='timestamp')              
