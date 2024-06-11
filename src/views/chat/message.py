@@ -9,7 +9,6 @@ from models.user import User
 
 class Message(Horizontal):
 
-    show_options = reactive(False, recompose=True)
     message = reactive('', recompose=True)
     deleted = reactive(False, recompose=True)
 
@@ -33,12 +32,6 @@ class Message(Horizontal):
     def parse_timestamp(self, timestamp):
         return datetime.fromisoformat(timestamp).astimezone().strftime('%H:%M:%S')
     
-    def on_enter(self):
-        self.show_options = True
-
-    def on_leave(self):
-        self.show_options = False
-
     def is_mention(self):
         for mention in self.message['mentions']:
             if mention['username'] == User.get_username():
@@ -47,6 +40,10 @@ class Message(Horizontal):
             if role_id in Messaging.get_users(self.message['channel_id'])[User.get_username()]['roles']:
                 return True
         return self.message['mention_everyone']
+    
+    @on(Button.Pressed, '.delete_button')
+    def on_delete(self):
+        Messaging.delete_message(self.message['channel_id'], self.message['id'])
 
     def compose(self):
         name = Label(f"{self.nick if self.nick else self.message['author']['username']}:", classes='username')
