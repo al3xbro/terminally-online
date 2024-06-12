@@ -41,8 +41,6 @@ class Connection:
                 'seq': 0
             }
         }))
-        # stop old heartbeat thread
-        Connection.heartbeat_thread.join()
         # update ws object
         Connection.ws = ws
         # start new heartbeat thread

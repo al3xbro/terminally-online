@@ -1,7 +1,7 @@
 from textual.widgets import Input
 from models.messaging import Messaging
 
-class ChatInput(Input):
+class CommandInput(Input):
 
     channel_id = None
 
