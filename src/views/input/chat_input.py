@@ -1,8 +1,9 @@
 from textual.widgets import Input
 from models.messaging import Messaging
 
-class CommandInput(Input):
+class ChatInput(Input):
 
+    # TODO: add edit, reply modes
     channel_id = None
 
     def __init__(self, channel_id, *args, **kwargs):

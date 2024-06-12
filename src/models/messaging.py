@@ -179,7 +179,7 @@ class Messaging:
                 return
             
     @staticmethod
-    def __get_message_history(channel_id: str, limit: int = 100, before: str = None) -> list:
+    def __get_message_history(channel_id: str, limit: int = 50, before: str = None) -> list:
         '''Returns a list of past messages in the current channel.'''
 
         # send request

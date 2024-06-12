@@ -73,8 +73,8 @@ Chat {
     padding: 2;
 }
 
-CommandInput {
+ChatInput, CommandInput {
     margin-left: 2;
     margin-right: 2;
-    margin-bottom: 2;
+    margin-bottom: 1;
 }

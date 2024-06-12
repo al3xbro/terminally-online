@@ -2,8 +2,8 @@ import time
 from textual.app import App
 from auth import auth
 from views.chat.chat import Chat
-from views.input.input import CommandInput
-from textual.widgets import Header
+from views.input.chat_input import ChatInput
+from textual.widgets import Header, Footer
 from websocket.listener import Listener
 
 class TerminallyOnline(App):
@@ -15,7 +15,8 @@ class TerminallyOnline(App):
     def compose(self):
         yield Header()
         yield Chat(self.guild_id, self.channel_id)
-        yield CommandInput(self.channel_id)
+        yield ChatInput(self.channel_id)
+        yield Footer()
 
 if __name__ == '__main__':
     while not Listener.ready:
