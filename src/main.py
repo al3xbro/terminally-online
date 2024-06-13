@@ -1,22 +1,26 @@
 import time
 from textual.app import App
 from auth import auth
-from views.chat.chat import Chat
-from views.input.chat_input import ChatInput
-from textual.widgets import Header, Footer
+from views.channelview.channel_view import ChannelView
+from views.commandview.command_view import CommandView
 from websocket.listener import Listener
+
 
 class TerminallyOnline(App):
 
-    CSS_PATH = 'style.tcss'
     guild_id = '1184053178380079175'
     channel_id = '1184053178975662192'
 
-    def compose(self):
-        yield Header()
-        yield Chat(self.guild_id, self.channel_id)
-        yield ChatInput(self.channel_id)
-        yield Footer()
+    CSS_PATH = 'style.tcss'
+
+    SCREENS = {
+        'channel_view': ChannelView(guild_id, channel_id),
+        'command_view': CommandView()
+    }
+
+    def on_mount(self):
+        self.push_screen('channel_view')
+
 
 if __name__ == '__main__':
     while not Listener.ready:

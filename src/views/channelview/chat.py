@@ -1,6 +1,6 @@
 from textual.containers import VerticalScroll
 from textual.events import MouseScrollUp
-from views.chat.message import Message
+from views.channelview.message import Message
 from models.messaging import Messaging
 
 class Chat(VerticalScroll):
