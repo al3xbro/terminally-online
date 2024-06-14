@@ -19,7 +19,7 @@ class TerminallyOnline(App):
     }
 
     def on_mount(self):
-        self.push_screen('channel_view')
+        self.push_screen('command_view')
 
 
 if __name__ == '__main__':
