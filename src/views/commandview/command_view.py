@@ -2,6 +2,7 @@ from textual.screen import Screen
 from textual.widgets import Header, Footer
 from views.commandview.input import CommandInput
 from views.commandview.display import Display
+from models.guilds import Guilds
 import sys
 import threading
 
@@ -14,7 +15,7 @@ class CommandView(Screen):
         super().__init__(*command, **kwcommand)
 
     def parse_command(self, value):
-        '''Possible commands: cd, ls, quit/exit/, logout, clear, help.
+        '''Possible commands: cd, ls, quit/exit, logout, clear, help.
            Possible errors: invalid command, too many arguments, too few arguments
         '''
 
