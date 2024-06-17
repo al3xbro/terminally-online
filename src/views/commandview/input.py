@@ -2,8 +2,6 @@ from textual.widgets import Input
 
 class CommandInput(Input):
 
-    current_path = []
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.placeholder = 'Enter your command here'
