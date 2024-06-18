@@ -4,10 +4,10 @@ from websocket.listener import Listener
 
 class Guilds:
     
-    guilds = {}
+    guilds = []
     private_channels = []
 
-    guilds_dirview = {}
+    guilds_dirview = []
 
     @staticmethod
     def __set_guilds(data: dict) -> None:
@@ -19,19 +19,21 @@ class Guilds:
         for guild in Guilds.guilds:
             
             # create guild
-            Guilds.guilds_dirview[guild['id']] = {
+            curr_guild = {
+                'id': guild['id'],
                 'name': guild['name'],
-                'categories': []
+                'subdirectories': []
             }
+            Guilds.guilds_dirview.append(curr_guild)
 
             # add categories
             for channel in guild['channels']:
                 if channel['type'] == 4:
-                    Guilds.guilds_dirview[guild['id']]['categories'].append({
+                    curr_guild['subdirectories'].append({
                         'id': channel['id'],
                         'name': channel['name'],
                         'position': channel['position'],
-                        'channels': []
+                        'subdirectories': []
                     })
 
             # add channels to categories
@@ -40,7 +42,7 @@ class Guilds:
                     min_category = None
 
                     # find the category it belongs to
-                    for category in Guilds.guilds_dirview[guild['id']]['categories']:
+                    for category in curr_guild['subdirectories']:
                         if min_category is None:
                             min_category = category
                         elif channel['position'] > category['position'] and category['position'] < min_category['position']:
@@ -48,7 +50,7 @@ class Guilds:
 
                     # add channel if it is uncategorized
                     if min_category:
-                        min_category['channels'].append({
+                        min_category['subdirectories'].append({
                             'id': channel['id'],
                             'name': channel['name'],
                             'position': channel['position']
@@ -56,26 +58,24 @@ class Guilds:
                     # if no category, that means it's uncategorized
                     else:
                         # if there no an uncategorized, make one
-                        if len(Guilds.guilds_dirview[guild['id']]['categories']) == 0 or Guilds.guilds_dirview[guild['id']]['categories'][0]['name'] != 'uncategorized':
-                            Guilds.guilds_dirview[guild['id']]['categories'].insert(0, {
+                        if len(curr_guild['subdirectories']) == 0 or curr_guild['subdirectories'][0]['name'] != 'uncategorized':
+                            curr_guild['subdirectories'].insert(0, {
                                 'id': 0,
                                 'name': 'uncategorized',
                                 'position': -1,
-                                'channels': [{
+                                'subdirectories': [{
                                     'name': channel['name'],
                                     'position': channel['position']
                                 }]
                             })
                         # add channel to uncategorized
                         else:
-                            Guilds.guilds_dirview[guild['id']]['categories'][0].append({
+                            curr_guild['subdirectories'][0].append({
                                 'id': channel['id'],
                                 'name': channel['name'],
                                 'position': channel['position']
                             })
 
-        json.dump(Guilds.guilds_dirview, open('bruh', 'w'))
-    
     @staticmethod
     def get_guilds() -> list:
         '''Returns the guilds'''
