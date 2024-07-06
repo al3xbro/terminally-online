@@ -8,7 +8,6 @@ import threading
 
 class CommandView(Screen):
 
-    guild_dirview = Guilds.guilds_dirview
     display = Display()
     path = []
 
@@ -23,7 +22,7 @@ class CommandView(Screen):
         if value.strip() == '':
             return
 
-        command = value.split(' ')
+        command = value.strip().split(' ')
 
         match command[0]:
             case 'cd':
@@ -44,26 +43,58 @@ class CommandView(Screen):
         self.display.add_prompt(self.path)
 
     def command_cd(self, command):
+        self.display.remove_prompt()
+        self.display.add_command(self.path, ' '.join(command))
+
         if len(command) > 2:
-            self.display.remove_prompt()
-            self.display.add_command(self.path, ' '.join(command))
             self.display.add_err('cd: too many arguments')
             return
 
-        self.display.remove_prompt()
-        self.display.add_command(self.path, ' '.join(command))
         potential_path = []
-        if len(command) == 1 or command[1] == '~':
-            pass
-        elif command[1].startswith('~/'):
-            potential_path = command[1][2:].split('/')
-        elif command[1].startswith('./'):
-            potential_path = self.path + command[1][2:].split('/')
+
+        # parse directory
+        if len(command) == 1:
+            potential_path = ['~']
         else:
-            potential_path = self.path + command[1].split('/')
+            potential_path = command[1].split('/')
+
+        # if relative path, add current path
+        if potential_path[0] != '~':
+            potential_path = self.path + potential_path
+        else:
+            potential_path = potential_path[1:]
+
+        parsed_path = []
         
-        # validate path and respond here
-        self.display.add_info('going to ' + str(potential_path))
+        for f in potential_path:
+            
+            if f == '..' and len(parsed_path) > 0:
+                parsed_path.pop()
+            elif f == '.':
+                continue
+            else: 
+                parsed_path.append(f)
+
+        current_path = Guilds.guilds_dirview
+
+        # test if path exists
+        for f in parsed_path:
+            found = False
+            for c in current_path:
+                if c['name'] == f:
+                    found = True
+                    if 'subdirectories' not in c:
+                        print(c)
+                        self.display.add_err(f'cd: {command[1]}: Not a directory')
+                        return
+                    current_path = c['subdirectories']
+                    break
+            if not found:
+                self.display.add_err(f'cd: {command[1]}: No such file or directory')
+                return
+
+        # update path
+        self.path = parsed_path
 
     def command_ls(self, command):
         self.display.remove_prompt()
