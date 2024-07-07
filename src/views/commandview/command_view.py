@@ -1,5 +1,6 @@
 from textual.screen import Screen
 from textual.widgets import Header, Footer
+from views.channelview.channel_view import ChannelView
 from views.commandview.input import CommandInput
 from views.commandview.display import Display
 from models.guilds import Guilds
@@ -26,6 +27,11 @@ class CommandView(Screen):
             return
 
         command = value.strip().split(' ')
+
+        if value.startswith('./'):
+            self.open_channel(value[2:])
+            self.display.add_prompt(self.path)
+            return
 
         match command[0]:
             case 'cd':
@@ -83,7 +89,7 @@ class CommandView(Screen):
             if 'subdirectories' in directory[0]:
                 res = ''
                 for c in directory[0]['subdirectories']:
-                    res += c['name'] + '\t'
+                    res += c['name'] + '  '
                 self.display.add_info(res)
             else:
                 self.display.add_err(f'ls: {command[1]}: Not a directory')
@@ -103,10 +109,19 @@ class CommandView(Screen):
         pass
     
     def command_not_found(self, command):
-        pass
+        self.display.add_err(f'{command[0]}: command not found')
 
     def open_channel(self, path):
-        pass
+        directory = self.get_dir(path.split('/'))
+        if directory == None:
+            self.display.add_err(f'./{path}: No such file or directory')
+        else:
+            if 'subdirectories' in directory[0]:
+                self.display.add_err(f'./{path}: Is a directory')
+            else:
+                if not self.app.is_screen_installed(f'channel_view_{directory[0]["id"]}'):
+                    self.app.install_screen(ChannelView(directory[0]['guild_id'], directory[0]['id']), f'channel_view_{directory[0]["id"]}')
+                self.app.push_screen(f'channel_view_{directory[0]["id"]}')
 
     def on_mount(self):
         self.display.remove_prompt()

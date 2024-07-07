@@ -53,7 +53,8 @@ class Guilds:
                         min_category['subdirectories'].append({
                             'id': channel['id'],
                             'name': channel['name'],
-                            'position': channel['position']
+                            'position': channel['position'],
+                            'guild_id': guild['id']
                         })
                     # if no category, that means it's uncategorized
                     else:

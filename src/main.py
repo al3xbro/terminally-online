@@ -8,13 +8,9 @@ from websocket.listener import Listener
 
 class TerminallyOnline(App):
 
-    guild_id = '1184053178380079175'
-    channel_id = '1184053178975662192'
-
     CSS_PATH = 'style.tcss'
 
     SCREENS = {
-        'channel_view': ChannelView(guild_id, channel_id),
         'command_view': CommandView()
     }
 
