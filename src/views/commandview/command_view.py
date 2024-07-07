@@ -46,20 +46,19 @@ class CommandView(Screen):
         self.display.add_prompt(self.path)
 
     def command_cd(self, command):
-
         if len(command) > 2:
             self.display.add_err('cd: too many arguments')
             return
         
+        # handle 
         parsed_path = []
-        if len(command) == 1:
-            parsed_path = ['~']
-        else: 
+        if len(command) != 1:
             parsed_path = command[1].split('/')
+        else: 
+            parsed_path = ['~']
 
         # update path
         directory = self.get_dir(parsed_path)
-        print(directory)
         if directory == None:
             self.display.add_err(f'cd: {command[1]}: No such file or directory')
         else:
@@ -69,7 +68,25 @@ class CommandView(Screen):
                 self.display.add_err(f'cd: {command[1]}: Not a directory')
 
     def command_ls(self, command):
-        pass
+        if len(command) > 2:
+            self.display.add_err('ls: too many arguments')
+            return
+        
+        parsed_path = []
+        if len(command) == 2:
+            parsed_path = command[1].split('/')
+
+        directory = self.get_dir(parsed_path)
+        if directory == None:
+            self.display.add_err(f'ls: {command[1]}: No such file or directory')
+        else:
+            if 'subdirectories' in directory[0]:
+                res = ''
+                for c in directory[0]['subdirectories']:
+                    res += c['name'] + '\t'
+                self.display.add_info(res)
+            else:
+                self.display.add_err(f'ls: {command[1]}: Not a directory')
 
     def command_quit(self, command):
         pass
@@ -101,10 +118,11 @@ class CommandView(Screen):
         yield CommandInput()
         yield Footer()
 
-    def get_dir(self, path: list):
+    def get_dir(self, path: list[str]):
+        '''Returns a tuple with the directory and the parsed path. Takes relative and absolute paths.'''
 
         # if relative path, add current path
-        if path[0] != '~':
+        if len(path) == 0 or path[0] != '~':
             path = self.path + path
         else:
             path = path[1:]
@@ -125,7 +143,6 @@ class CommandView(Screen):
         for f in parsed_path:
             found = False
             if 'subdirectories' not in current_path:
-                print('no subdirectory')
                 return None
             for c in current_path['subdirectories']:
                 if c['name'] == f:
@@ -133,8 +150,6 @@ class CommandView(Screen):
                     current_path = c
                     break
             if not found:
-                print('no subdirectories found')
                 return None
             
-        print(current_path, parsed_path)
         return (current_path, parsed_path)
