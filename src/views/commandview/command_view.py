@@ -15,6 +15,9 @@ class CommandView(Screen):
         super().__init__(*command, **kwcommand)
 
     def parse_command(self, value: str):
+        self.display.remove_prompt()
+        self.display.add_command(self.path, value)
+
         '''Possible commands: cd, ls, quit/exit, logout, clear, help.
            Possible errors: invalid command, too many arguments, too few arguments
         '''
@@ -43,31 +46,72 @@ class CommandView(Screen):
         self.display.add_prompt(self.path)
 
     def command_cd(self, command):
-        self.display.remove_prompt()
-        self.display.add_command(self.path, ' '.join(command))
 
         if len(command) > 2:
             self.display.add_err('cd: too many arguments')
             return
-
-        potential_path = []
-
-        # parse directory
+        
+        parsed_path = []
         if len(command) == 1:
-            potential_path = ['~']
+            parsed_path = ['~']
+        else: 
+            parsed_path = command[1].split('/')
+
+        # update path
+        directory = self.get_dir(parsed_path)
+        print(directory)
+        if directory == None:
+            self.display.add_err(f'cd: {command[1]}: No such file or directory')
         else:
-            potential_path = command[1].split('/')
+            if 'subdirectories' in directory[0] or len(directory[1]) == 0:
+                self.path = directory[1]
+            else:
+                self.display.add_err(f'cd: {command[1]}: Not a directory')
+
+    def command_ls(self, command):
+        pass
+
+    def command_quit(self, command):
+        pass
+        threading.exit()
+        sys.exit()
+
+    def command_logout(self, command):
+        pass
+
+    def command_clear(self, command):
+        pass
+
+    def command_help(self, command):
+        pass
+    
+    def command_not_found(self, command):
+        pass
+
+    def open_channel(self, path):
+        pass
+
+    def on_mount(self):
+        self.display.remove_prompt()
+        self.display.add_prompt(self.path)
+
+    def compose(self):
+        yield Header()
+        yield self.display
+        yield CommandInput()
+        yield Footer()
+
+    def get_dir(self, path: list):
 
         # if relative path, add current path
-        if potential_path[0] != '~':
-            potential_path = self.path + potential_path
+        if path[0] != '~':
+            path = self.path + path
         else:
-            potential_path = potential_path[1:]
+            path = path[1:]
 
         parsed_path = []
         
-        for f in potential_path:
-            
+        for f in path:
             if f == '..' and len(parsed_path) > 0:
                 parsed_path.pop()
             elif f == '.':
@@ -80,58 +124,17 @@ class CommandView(Screen):
         # test if path exists
         for f in parsed_path:
             found = False
-            for c in current_path:
+            if 'subdirectories' not in current_path:
+                print('no subdirectory')
+                return None
+            for c in current_path['subdirectories']:
                 if c['name'] == f:
                     found = True
-                    if 'subdirectories' not in c:
-                        print(c)
-                        self.display.add_err(f'cd: {command[1]}: Not a directory')
-                        return
-                    current_path = c['subdirectories']
+                    current_path = c
                     break
             if not found:
-                self.display.add_err(f'cd: {command[1]}: No such file or directory')
-                return
-
-        # update path
-        self.path = parsed_path
-
-    def command_ls(self, command):
-        self.display.remove_prompt()
-        self.display.add_command(self.path, ' '.join(command))
-
-    def command_quit(self, command):
-        self.display.remove_prompt()
-        self.display.add_command(self.path, ' '.join(command))
-        threading.exit()
-        sys.exit()
-
-    def command_logout(self, command):
-        self.display.remove_prompt()
-        self.display.add_command(self.path, ' '.join(command))
-
-    def command_clear(self, command):
-        self.display.remove_prompt()
-        self.display.add_command(self.path, ' '.join(command))
-
-    def command_help(self, command):
-        self.display.remove_prompt()
-        self.display.add_command(self.path, ' '.join(command))
-    
-    def command_not_found(self, command):
-        self.display.remove_prompt()
-        self.display.add_command(self.path, ' '.join(command))
-
-    def open_channel(self, path):
-        self.display.remove_prompt()
-        self.display.add_command(self.path, path)
-
-    def on_mount(self):
-        self.display.remove_prompt()
-        self.display.add_prompt(self.path)
-
-    def compose(self):
-        yield Header()
-        yield self.display
-        yield CommandInput()
-        yield Footer()
+                print('no subdirectories found')
+                return None
+            
+        print(current_path, parsed_path)
+        return (current_path, parsed_path)

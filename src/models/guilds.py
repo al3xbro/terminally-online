@@ -7,7 +7,7 @@ class Guilds:
     guilds = []
     private_channels = []
 
-    guilds_dirview = []
+    guilds_dirview = {'subdirectories': []}
 
     @staticmethod
     def __set_guilds(data: dict) -> None:
@@ -24,7 +24,7 @@ class Guilds:
                 'name': guild['name'],
                 'subdirectories': []
             }
-            Guilds.guilds_dirview.append(curr_guild)
+            Guilds.guilds_dirview['subdirectories'].append(curr_guild)
 
             # add categories
             for channel in guild['channels']:
@@ -75,6 +75,8 @@ class Guilds:
                                 'name': channel['name'],
                                 'position': channel['position']
                             })
+        
+
 
     @staticmethod
     def get_guilds() -> list:
